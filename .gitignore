@@ -38,3 +38,9 @@ data/focus_training/dataset_audit_report_*.md
 data/focus_training/session_review_worksheet_*
 
 data/focus_training/session_label_template_*.csv
+# Additional protection
+**/firebase-key.json
+**/.env
+**/device_data.json
+**/student_data.json
+**/teacher_requests.json
