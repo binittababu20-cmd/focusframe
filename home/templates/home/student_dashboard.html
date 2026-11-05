@@ -1,0 +1,758 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}Student Dashboard - FocusFrame{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<style>
+
+    .empty-data {
+        color: #687083;
+        font-size: 14px;
+    }
+
+    .empty-number {
+        color: #687083;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .session-badge.inactive {
+        background: #eef1f6;
+        color: #687083;
+    }
+
+    .progress-fill.empty {
+        width: 0 !important;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard">
+
+<!-- =====================================================
+     SIDEBAR
+====================================================== -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <h2>FocusFrame</h2>
+
+        <p>Student Panel</p>
+
+    </div>
+
+    <div style="margin: 15px 0 20px 0; padding: 12px 14px; background: rgba(255, 255, 255, 0.08); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a0aec0; margin-bottom: 4px;">Logged in as</div>
+        <div style="font-weight: 700; color: #ffffff; font-size: 14px; word-break: break-all;">{{ request.user.username }}</div>
+        <span style="display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #16803c; color: #ffffff;">Student</span>
+    </div>
+
+
+    <nav>
+
+        <a href="{% url 'student_dashboard' %}" class="active">
+            🏠 Dashboard
+        </a>
+
+
+        <a href="{% url 'scan_qr' %}">
+            📷 Scan QR
+        </a>
+
+
+        <a href="#session-card-section">
+            📅 Attendance
+        </a>
+
+
+        <a href="#focus-overview-section">
+            📱 Phone Usage
+        </a>
+
+
+        <a href="{% url 'register_device' %}">
+            📲 Register Device
+        </a>
+
+
+    <a href="{% url 'student_profile' %}">
+        👤 Profile
+    </a>
+
+
+        <a href="{% url 'logout' %}">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</aside>
+
+
+
+<!-- =====================================================
+     MAIN CONTENT
+====================================================== -->
+
+<main class="content">
+    {% if messages %}
+    <div style="margin-bottom: 25px;">
+        {% for message in messages %}
+            <div style="
+                padding: 14px 20px;
+                margin-bottom: 12px;
+                border-radius: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                {% if message.tags == 'error' or 'Access denied' in message.message or 'Invalid' in message.message %}
+                    background: #ffe9eb;
+                    color: #d94b5b;
+                    border: 1px solid #ffd0d6;
+                {% elif message.tags == 'success' %}
+                    background: #eaf8ef;
+                    color: #16794c;
+                    border: 1px solid #b7e4c7;
+                {% else %}
+                    background: #fff4dc;
+                    color: #b26a00;
+                    border: 1px solid #ffe3a3;
+                {% endif %}
+            ">
+                <span style="font-size: 18px;">{% if message.tags == 'success' %}✅{% else %}⚠️{% endif %}</span>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>
+                Student Dashboard
+            </h1>
+
+            <p>
+                Welcome to FocusFrame 👋
+            </p>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =================================================
+         DASHBOARD STATISTICS
+    ================================================== -->
+
+    <section class="dashboard-stats">
+
+
+        <!-- ATTENDANCE -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📅
+            </div>
+
+            <div class="stat-info">
+
+                {% if monitoring_active %}
+
+                <h3>Attendance Status</h3>
+
+                <h2>
+                    {% if current_session_present %}
+                        <span style="color:#27ae60;">Present</span>
+                    {% else %}
+                        <span style="color:#e74c3c;">Not Marked</span>
+                    {% endif %}
+                </h2>
+
+                <p>
+                    Active Session
+                    {% if overall_attendance_percentage is not None %}
+                        &middot; Overall: {{ overall_attendance_percentage }}%
+                    {% endif %}
+                </p>
+
+                {% else %}
+
+                <h3>Attendance</h3>
+
+                <h2>
+                    {% if overall_attendance_percentage is not None %}
+                        {{ overall_attendance_percentage }}%
+                    {% else %}
+                        —
+                    {% endif %}
+                </h2>
+
+                <p>
+                    {% if total_sessions %}
+                        {{ present_sessions }} of {{ total_sessions }} sessions present
+                    {% else %}
+                        No attendance data yet
+                    {% endif %}
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FOCUS SCORE -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🎯
+            </div>
+
+            <div class="stat-info">
+
+                <h3>
+                    Focus Score
+                </h3>
+
+                <h2>
+                    {% if focus_score is not None %}{{ focus_score }}%{% else %}&mdash;{% endif %}
+                </h2>
+
+                <p>
+                    {% if focus_score is not None %}{{ focus_level }}{% else %}No focus data yet{% endif %}
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DEVICE -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📱
+            </div>
+
+            <div class="stat-info">
+
+                <h3>
+                    Device
+                </h3>
+
+                <h2>
+
+                    {% if user_device %}
+
+                        {{ user_device.device_name }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </h2>
+
+                <p>
+
+                    {% if user_device %}
+
+                        Registered
+                        (IMEI: {{ user_device.imei_number }})
+
+                    {% else %}
+
+                        No device registered yet
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         TODAY'S SESSION
+    ================================================== -->
+
+    <section
+        class="session-card"
+        id="session-card-section"
+    >
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    Today's Session
+                </h2>
+
+                <p>
+                    Your current classroom activity
+                </p>
+
+            </div>
+
+
+            {% if monitoring_active %}
+
+                <span
+                    class="session-badge active"
+                    style="
+                        background: #eaf8ef;
+                        color: #16794c;
+                        font-weight: 700;
+                        padding: 6px 14px;
+                        border-radius: 20px;
+                    "
+                >
+                    ● Active Session: {{ active_class }}
+                </span>
+
+            {% else %}
+
+                <span class="session-badge inactive">
+                    ● No Active Session
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <div class="session-details">
+
+
+            <!-- CLASS -->
+
+            <div class="session-row">
+
+                <span>Class</span>
+
+                <strong>
+                    {% if monitoring_active %}
+                        {{ active_class }}
+                    {% elif latest_attendance %}
+                        {{ latest_attendance.classroom }}
+                    {% else %}
+                        No session yet
+                    {% endif %}
+                </strong>
+
+            </div>
+
+
+
+            <!-- SESSION TIME -->
+
+            <div class="session-row">
+
+                <span>Session Time</span>
+
+                <strong>
+                    {% if monitoring_active and session_time %}
+                        {{ session_time }}
+                    {% else %}
+                        Not started
+                    {% endif %}
+                </strong>
+
+            </div>
+
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="session-row">
+
+                <span>Attendance</span>
+
+                <strong>
+                    {% if monitoring_active %}
+                        {% if current_session_present %}
+                            <span style="color:#27ae60;">Present</span>
+                        {% else %}
+                            <span style="color:#e74c3c;">Not Marked</span>
+                        {% endif %}
+                    {% elif latest_attendance %}
+                        {{ latest_attendance.status }}
+                    {% else %}
+                        No attendance yet
+                    {% endif %}
+                </strong>
+
+            </div>
+
+
+
+            <!-- FOCUS -->
+
+            <div class="session-row">
+
+                <span>
+                    Focus Score
+                </span>
+
+                <strong>
+                    {% if focus_score is not None %}{{ focus_level }}{% else %}No data{% endif %}
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         FOCUS OVERVIEW
+    ================================================== -->
+
+    <section
+        class="focus-card"
+        id="focus-overview-section"
+    >
+
+        <div class="focus-header">
+
+            <div>
+
+                <h2>
+                    Focus Overview
+                </h2>
+
+                <p>
+                    Your classroom focus during the current session
+                </p>
+
+            </div>
+
+
+            <div class="focus-score">
+
+                <strong>
+                    {% if focus_score is not None %}{{ focus_score }}{% else %}&mdash;{% endif %}
+                </strong>
+
+                <span>
+                    / 100
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FOCUS PROGRESS -->
+
+        <div class="progress-area">
+
+            <div class="progress-label">
+
+                <span>
+                    Focus level
+                </span>
+
+                <strong>
+                    {% if focus_score is not None %}{{ focus_level }}{% else %}No data{% endif %}
+                </strong>
+
+            </div>
+
+
+            <div class="progress-bar">
+
+                <div class="progress-fill{% if focus_score is None %} empty{% endif %}"
+                     style="width:{% if focus_score is not None %}{{ focus_score }}{% else %}0{% endif %}%">
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FOCUS INFORMATION -->
+
+        <div class="focus-info">
+
+
+            <div>
+
+                <span>
+                    📚
+                </span>
+
+                <strong>
+                    Academic Activity
+                </strong>
+
+                <small>
+                    {% if total_usage_records > 0 %}{{ edu_seconds|floatformat:0 }}s educational{% else %}No activity data yet{% endif %}
+                </small>
+
+            </div>
+
+
+
+            <div>
+
+                <span>
+                    📱
+                </span>
+
+                <strong>
+                    Phone Usage
+                </strong>
+
+                <small>
+                    {% if total_usage_records > 0 %}{{ non_edu_seconds|floatformat:0 }}s non-educational ({{ total_usage_records }} record{{ total_usage_records|pluralize }}){% else %}No phone usage data yet{% endif %}
+                </small>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         QUICK ACTIONS
+    ================================================== -->
+
+    <section class="quick-section">
+
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    Quick Actions
+                </h2>
+
+                <p>
+                    Access FocusFrame features
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="quick-actions">
+
+
+            <!-- SCAN QR -->
+
+            <a
+                href="{% url 'scan_qr' %}"
+                class="quick-card"
+            >
+
+                <div class="quick-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Scan QR
+                </h3>
+
+                <p>
+                    Mark your attendance
+                </p>
+
+            </a>
+
+
+
+            <!-- REGISTER DEVICE -->
+
+            <a
+                href="{% url 'register_device' %}"
+                class="quick-card"
+            >
+
+                <div class="quick-icon">
+                    📲
+                </div>
+
+                <h3>
+                    Register Device
+                </h3>
+
+                <p>
+                    Connect your phone
+                </p>
+
+            </a>
+
+
+
+            <!-- PHONE USAGE -->
+
+            <a
+                href="#"
+                class="quick-card"
+            >
+
+                <div class="quick-icon">
+                    📱
+                </div>
+
+                <h3>
+                    Phone Usage
+                </h3>
+
+                <p>
+                    View your usage
+                </p>
+
+            </a>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         RECENT ACTIVITY
+    ================================================== -->
+
+    <section
+        class="activity-card"
+        id="recent-activity-section"
+    >
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    Recent Activity
+                </h2>
+
+                <p>
+                    Your latest FocusFrame activity
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="activity-list">
+
+
+            {% if recent_activities %}
+
+                {% for activity in recent_activities %}
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            {{ activity.icon }}
+                        </div>
+
+                        <div class="activity-text">
+
+                            <strong>
+                                {{ activity.title }}
+                            </strong>
+
+                            <span>
+                                {{ activity.description }}
+                            </span>
+
+                        </div>
+
+                        <time>
+                            {{ activity.time }}
+                        </time>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <div class="activity-item">
+
+                    <div class="activity-icon">
+                        📋
+                    </div>
+
+                    <div class="activity-text">
+
+                        <strong>
+                            No recent activity
+                        </strong>
+
+                        <span>
+                            Your FocusFrame activity will appear here.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+</div>
+
+{% endblock %}

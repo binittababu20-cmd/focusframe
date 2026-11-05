@@ -1,0 +1,1329 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard - FocusFrame{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<style>
+
+    .dashboard {
+        display: flex !important;
+        min-height: 100vh;
+    }
+
+
+    .sidebar {
+        flex-shrink: 0;
+    }
+
+
+    .content {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+
+        flex: 1 !important;
+
+        width: auto !important;
+        min-width: 0;
+
+        padding: 40px !important;
+        margin: 0 !important;
+
+        color: #10132B;
+    }
+
+
+    .topbar,
+    .dashboard-stats,
+    .session-card,
+    .activity-card {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+    }
+
+
+    .dashboard-stats {
+
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(4, 1fr);
+
+        gap: 20px;
+
+        margin: 30px 0;
+    }
+
+
+    .stat-card {
+
+        display: flex !important;
+
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+
+    .session-card,
+    .activity-card {
+
+        margin-bottom: 25px;
+    }
+
+
+    .empty-data {
+
+        text-align: center;
+
+        padding: 25px;
+
+        color: #687083;
+    }
+
+
+    .no-data {
+        color: #687083;
+    }
+
+
+    .student-list-card {
+        margin-bottom: 25px;
+    }
+
+
+    .student-table {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+
+    .student-table-header,
+    .student-row {
+
+        min-width: 850px;
+
+        display: grid;
+
+        grid-template-columns:
+            2fr
+            1.2fr
+            2fr
+            1.3fr
+            1fr;
+
+        gap: 20px;
+
+        align-items: center;
+    }
+
+
+    .student-table-header {
+
+        padding: 16px 20px;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+        color: #687083;
+
+        border-bottom: 1px solid #e7e9ef;
+
+        text-transform: uppercase;
+    }
+
+
+    .student-row {
+
+        padding: 18px 20px;
+
+        border-bottom: 1px solid #eef0f4;
+
+        background: #ffffff;
+    }
+
+
+    .student-row:last-child {
+        border-bottom: none;
+    }
+
+
+    .student-name {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+    }
+
+
+    .student-avatar {
+
+        width: 42px;
+        height: 42px;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        background: #eef1ff;
+
+        font-weight: 700;
+
+        color: #3949ab;
+
+        flex-shrink: 0;
+    }
+
+
+    .student-name strong {
+        display: block;
+
+        font-size: 14px;
+
+        color: #10132B;
+    }
+
+
+    .student-name small {
+
+        display: block;
+
+        margin-top: 3px;
+
+        color: #687083;
+
+        font-size: 12px;
+    }
+
+
+    .student-email {
+        color: #687083;
+
+        font-size: 13px;
+
+        word-break: break-word;
+    }
+
+
+    .device-name {
+        font-size: 13px;
+
+        color: #34394a;
+    }
+
+
+    .device-not-registered {
+        color: #9aa0ad;
+
+        font-size: 13px;
+    }
+
+
+    .status-active {
+        color: #16803c;
+
+        font-weight: 600;
+
+        font-size: 13px;
+    }
+
+
+    .status-inactive {
+        color: #9a6700;
+
+        font-weight: 600;
+
+        font-size: 13px;
+    }
+
+
+    .status-dot {
+        margin-right: 4px;
+    }
+
+
+    .section-heading {
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        gap: 20px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .section-heading h2 {
+        margin-bottom: 5px;
+    }
+
+
+    .section-heading p {
+        margin: 0;
+
+        color: #687083;
+    }
+
+
+    .student-count-badge {
+
+        padding: 7px 12px;
+
+        border-radius: 20px;
+
+        background: #eef1ff;
+
+        color: #3949ab;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+
+    .session-details {
+        width: 100%;
+    }
+
+
+    .session-row {
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        padding: 15px 0;
+
+        border-bottom: 1px solid #eef0f4;
+    }
+
+
+    .session-row:last-child {
+        border-bottom: none;
+    }
+
+
+    .session-row span {
+        color: #687083;
+    }
+
+
+    .session-row strong {
+        color: #10132B;
+    }
+
+
+    .approval-actions {
+
+        display: flex;
+
+        gap: 8px;
+
+        align-items: center;
+    }
+
+
+    .approve-btn,
+    .reject-btn {
+
+        border: none;
+
+        padding: 8px 12px;
+
+        border-radius: 7px;
+
+        cursor: pointer;
+
+        font-size: 12px;
+
+        font-weight: 600;
+    }
+
+
+    .approve-btn {
+        background: #e8f7ee;
+
+        color: #16803c;
+    }
+
+
+    .reject-btn {
+        background: #fdecec;
+
+        color: #c62828;
+    }
+
+
+    .status-warning {
+        color: #b26a00;
+
+        font-weight: 600;
+
+        font-size: 13px;
+    }
+
+
+    .status-success {
+        color: #16803c;
+
+        font-weight: 600;
+
+        font-size: 13px;
+    }
+
+
+    .status-rejected {
+        color: #c62828;
+
+        font-weight: 600;
+
+        font-size: 13px;
+    }
+
+
+    .action-completed {
+        color: #687083;
+
+        font-size: 12px;
+    }
+
+
+    @media (max-width: 1000px) {
+
+        .dashboard-stats {
+
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+        .dashboard {
+
+            display: block !important;
+        }
+
+
+        .content {
+
+            padding: 25px !important;
+        }
+
+
+        .dashboard-stats {
+
+            grid-template-columns:
+                1fr;
+        }
+
+
+        .section-heading {
+
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+    }
+
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard">
+
+<!-- =================================================
+     SIDEBAR
+================================================== -->
+
+<aside class="sidebar">
+
+
+    <div class="logo">
+
+        <h2>
+            FocusFrame
+        </h2>
+
+        <p>
+            Admin Panel
+        </p>
+
+    </div>
+
+
+    <nav>
+
+
+        <a href="{% url 'admin_dashboard' %}"
+           class="active">
+
+            🏠 Dashboard
+
+        </a>
+
+
+        <a href="#teacher-approval">
+
+            👩‍🏫 Teachers
+
+        </a>
+
+
+        <a href="{% url 'student_list' %}">
+
+            👥 Students
+
+        </a>
+
+
+        <a href="#device-management-section">
+
+            📱 Devices
+
+        </a>
+
+
+        <a href="#reports-section">
+
+            📊 Reports
+
+        </a>
+
+
+        <a href="#system-activity-section">
+
+            ⚙️ System
+
+        </a>
+
+
+        <a href="{% url 'logout' %}">
+
+            🚪 Logout
+
+        </a>
+
+
+    </nav>
+
+</aside>
+
+
+
+<!-- =================================================
+     MAIN CONTENT
+================================================== -->
+
+<main class="content">
+
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>
+                Admin Dashboard
+            </h1>
+
+            <p>
+                Manage FocusFrame system access and activity
+            </p>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =================================================
+         STATISTICS
+    ================================================== -->
+
+    <section class="dashboard-stats">
+
+
+        <!-- TEACHERS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                👩‍🏫
+            </div>
+
+            <div class="stat-info">
+
+                <h3>
+                    Total Teachers
+                </h3>
+
+                <h2>
+
+                    {% if total_teachers %}
+                        {{ total_teachers }}
+                    {% else %}
+                        0
+                    {% endif %}
+
+                </h2>
+
+                <p>
+                    Registered teachers
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STUDENTS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                👥
+            </div>
+
+            <div class="stat-info">
+
+                <h3>
+                    Total Students
+                </h3>
+
+                <h2>
+
+                    {% if total_students %}
+                        {{ total_students }}
+                    {% else %}
+                        0
+                    {% endif %}
+
+                </h2>
+
+                <p>
+                    Registered students
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DEVICES -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📱
+            </div>
+
+            <div class="stat-info">
+
+                <h3>
+                    Registered Devices
+                </h3>
+
+                <h2>
+
+                    {% if total_devices %}
+                        {{ total_devices }}
+                    {% else %}
+                        0
+                    {% endif %}
+
+                </h2>
+
+                <p>
+                    Connected student devices
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- APPROVALS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                ⚠️
+            </div>
+
+            <div class="stat-info">
+
+                <h3>
+                    Pending Approvals
+                </h3>
+
+                <h2>
+
+                    {% if pending_count %}
+                        {{ pending_count }}
+                    {% else %}
+                        0
+                    {% endif %}
+
+                </h2>
+
+                <p>
+                    Teacher requests
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         SYSTEM OVERVIEW
+    ================================================== -->
+
+    <section class="session-card">
+
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    System Overview
+                </h2>
+
+                <p>
+                    Current FocusFrame activity
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="session-details">
+
+
+            <div class="session-row">
+
+                <span>
+                    Active Sessions
+                </span>
+
+                <strong>
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="session-row">
+
+                <span>
+                    Students Currently Online
+                </span>
+
+                <strong>
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="session-row">
+
+                <span>
+                    Connected Devices
+                </span>
+
+                <strong>
+
+                    {% if total_devices %}
+                        {{ total_devices }}
+                    {% else %}
+                        0
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="session-row">
+
+                <span>
+                    System Status
+                </span>
+
+                <strong class="no-data">
+                    Waiting for activity
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         STUDENT LIST
+    ================================================== -->
+
+    <section class="activity-card student-list-card"
+             id="student-list">
+
+
+        <div class="section-heading">
+
+
+            <div>
+
+                <h2>
+                    Student List
+                </h2>
+
+                <p>
+                    View students registered with FocusFrame
+                </p>
+
+            </div>
+
+
+            <span class="student-count-badge">
+
+                {% if total_students %}
+                    {{ total_students }} Students
+                {% else %}
+                    0 Students
+                {% endif %}
+
+            </span>
+
+
+        </div>
+
+
+
+        <div class="student-table">
+
+
+            <div class="student-table-header">
+
+                <span>
+                    Student
+                </span>
+
+                <span>
+                    Student ID
+                </span>
+
+                <span>
+                    Email
+                </span>
+
+                <span>
+                    Device
+                </span>
+
+                <span>
+                    Status
+                </span>
+
+            </div>
+
+
+
+            {% for student in students %}
+
+
+                <div class="student-row">
+
+
+                    <!-- STUDENT -->
+
+                    <div class="student-name">
+
+
+                        <div class="student-avatar">
+
+                            {% if student.name %}
+                                {{ student.name|first|upper }}
+                            {% elif student.full_name %}
+                                {{ student.full_name|first|upper }}
+                            {% else %}
+                                S
+                            {% endif %}
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+
+                                {% if student.name %}
+                                    {{ student.name }}
+                                {% elif student.full_name %}
+                                    {{ student.full_name }}
+                                {% else %}
+                                    Student
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- STUDENT ID -->
+
+                    <span>
+
+                        {% if student.student_id %}
+                            {{ student.student_id }}
+                        {% elif student.register_number %}
+                            {{ student.register_number }}
+                        {% elif student.register_no %}
+                            {{ student.register_no }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </span>
+
+
+
+                    <!-- EMAIL -->
+
+                    <span class="student-email">
+
+                        {% if student.email %}
+                            {{ student.email }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </span>
+
+
+
+                    <!-- DEVICE -->
+
+                    <span>
+
+                        {% if student.device_name %}
+
+                            <span class="device-name">
+                                📱 {{ student.device_name }}
+                            </span>
+
+                        {% elif student.device %}
+
+                            <span class="device-name">
+                                📱 {{ student.device }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="device-not-registered">
+                                No device
+                            </span>
+
+                        {% endif %}
+
+                    </span>
+
+
+
+                    <!-- STATUS -->
+
+                    <span>
+
+                        {% if student.status == "Active" %}
+
+                            <span class="status-active">
+                                <span class="status-dot">●</span>
+                                Active
+                            </span>
+
+                        {% elif student.status == "Inactive" %}
+
+                            <span class="status-inactive">
+                                <span class="status-dot">●</span>
+                                Inactive
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-active">
+                                <span class="status-dot">●</span>
+                                Registered
+                            </span>
+
+                        {% endif %}
+
+                    </span>
+
+
+                </div>
+
+
+            {% empty %}
+
+
+                <div class="empty-data">
+
+                    <p>
+                        No registered students found.
+                    </p>
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         TEACHER APPROVAL
+    ================================================== -->
+
+    <section class="activity-card"
+             id="teacher-approval">
+
+
+        <div class="section-heading">
+
+
+            <div>
+
+                <h2>
+                    Teacher Approval
+                </h2>
+
+                <p>
+                    Review teachers requesting access to FocusFrame
+                </p>
+
+            </div>
+
+
+            <span class="session-badge">
+
+                {% if pending_count %}
+
+                    {{ pending_count }} Pending
+
+                {% else %}
+
+                    No Pending Requests
+
+                {% endif %}
+
+            </span>
+
+
+        </div>
+
+
+
+        <div class="student-table">
+
+
+            <div class="student-table-header">
+
+                <span>
+                    Teacher
+                </span>
+
+                <span>
+                    Department
+                </span>
+
+                <span>
+                    Status
+                </span>
+
+                <span>
+                    Action
+                </span>
+
+            </div>
+
+
+
+            {% for teacher in teacher_requests %}
+
+
+                <div class="student-row"
+                     style="grid-template-columns: 2fr 1.2fr 1.2fr 1.5fr;">
+
+
+                    <div class="student-name">
+
+
+                        <div class="student-avatar">
+
+                            {{ teacher.name|first|upper }}
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                {{ teacher.name }}
+                            </strong>
+
+                            <small>
+                                {{ teacher.teacher_id }}
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <span>
+                        {{ teacher.department }}
+                    </span>
+
+
+
+                    {% if teacher.status == "Pending" %}
+
+                        <span class="status-warning">
+                            ● Pending
+                        </span>
+
+                    {% elif teacher.status == "Approved" %}
+
+                        <span class="status-success">
+                            ● Approved
+                        </span>
+
+                    {% elif teacher.status == "Rejected" %}
+
+                        <span class="status-rejected">
+                            ● Rejected
+                        </span>
+
+                    {% else %}
+
+                        <span class="no-data">
+                            No status
+                        </span>
+
+                    {% endif %}
+
+
+
+                    <div class="approval-actions">
+
+
+                        {% if teacher.status == "Pending" %}
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'approve_teacher' teacher.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="approve-btn"
+                                >
+                                    Approve
+                                </button>
+
+                            </form>
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'reject_teacher' teacher.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="reject-btn"
+                                >
+                                    Reject
+                                </button>
+
+                            </form>
+
+
+                        {% else %}
+
+                            <span class="action-completed">
+                                Completed
+                            </span>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% empty %}
+
+
+                <div class="empty-data">
+
+                    <p>
+                        No teacher registration requests yet.
+                    </p>
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         RECENT SYSTEM ACTIVITY
+    ================================================== -->
+
+    <section class="activity-card">
+
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    Recent System Activity
+                </h2>
+
+                <p>
+                    Latest administrative activity
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="alert-list">
+
+
+            {% if recent_system_activity %}
+
+
+                {% for activity in recent_system_activity %}
+
+
+                    <div class="alert-item">
+
+
+                        <div class="alert-icon">
+                            {{ activity.icon }}
+                        </div>
+
+
+                        <div class="alert-text">
+
+                            <strong>
+                                {{ activity.title }}
+                            </strong>
+
+                            <span>
+                                {{ activity.description }}
+                            </span>
+
+                        </div>
+
+
+                        <time>
+                            {{ activity.time }}
+                        </time>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div class="empty-data">
+
+                    <p>
+                        No recent system activity.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+</div>
+
+{% endblock %}

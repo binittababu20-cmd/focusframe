@@ -1,0 +1,229 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Students - FocusFrame</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/shared.css' %}">
+
+    <link rel="stylesheet"
+          href="{% static 'css/style.css' %}">
+
+    <link rel="stylesheet"
+          href="{% static 'css/dashboard.css' %}">
+
+</head>
+
+<body class="dashboard-body">
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>
+                FocusFrame
+            </h2>
+
+            <p>
+                Admin Panel
+            </p>
+
+        </div>
+
+        <nav>
+
+            <a href="{% url 'admin_dashboard' %}">
+                🏠 Dashboard
+            </a>
+
+            <a href="#">
+                👩‍🏫 Teachers
+            </a>
+
+            <a href="{% url 'student_list' %}"
+               class="active">
+                👥 Students
+            </a>
+
+            <a href="#">
+                📱 Devices
+            </a>
+
+            <a href="#">
+                📊 Reports
+            </a>
+
+            <a href="#">
+                ⚙️ System
+            </a>
+
+            <a href="#">
+                👤 Profile
+            </a>
+
+            <a href="{% url 'logout' %}">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="content">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Students
+                </h1>
+
+                <p>
+                    View registered FocusFrame students
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- STUDENT LIST -->
+
+        <section class="activity-card">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Registered Students
+                    </h2>
+
+                    <p>
+                        Students who have created a FocusFrame account
+                    </p>
+
+                </div>
+
+                <span class="session-badge">
+
+                    {{ students|length }} Students
+
+                </span>
+
+            </div>
+
+
+            <div class="student-table">
+
+                <div class="student-table-header">
+
+                    <span>
+                        Student
+                    </span>
+
+                    <span>
+                        Student ID
+                    </span>
+
+                    <span>
+                        Email
+                    </span>
+
+                    <span>
+                        Status
+                    </span>
+
+                </div>
+
+
+                {% for student in students %}
+
+                    <div class="student-row">
+
+                        <div class="student-name">
+
+                            <div class="student-avatar">
+
+                                {{ student.full_name|first|upper }}
+
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    {{ student.full_name }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <span>
+                            {{ student.student_id }}
+                        </span>
+
+
+                        <span>
+                            {{ student.email }}
+                        </span>
+
+
+                        <span class="status-success">
+
+                            ● Registered
+
+                        </span>
+
+                    </div>
+
+                {% empty %}
+
+                    <div class="empty-data">
+
+                        <p>
+                            No students registered yet.
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <br>
+
+
+        <a href="{% url 'admin_dashboard' %}">
+            ← Back to Admin Dashboard
+        </a>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

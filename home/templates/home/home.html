@@ -1,0 +1,394 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}FocusFrame - Classroom Focus Intelligence{% endblock %}
+
+{% block extra_css %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+<div class="container hero-grid">
+
+    <div class="hero-copy">
+
+        <span class="eyebrow">
+            Live in the Dept. of Computer Applications
+        </span>
+
+        <h1 class="hero-title">
+            Attendance marked in a blink.<br>
+            Focus measured in real time.
+        </h1>
+
+        <p class="hero-sub">
+            FocusFrame pairs QR check-in with on-device usage classification,
+            so every class session produces two honest numbers:
+            who showed up, and who's actually here.
+        </p>
+
+        <div class="hero-actions">
+
+            <a href="{% url 'register' %}" class="btn btn-primary">
+                Get started
+            </a>
+
+            <a href="#how-it-works" class="btn btn-ghost">
+                See how it works
+            </a>
+
+        </div>
+
+
+        <div class="hero-stats">
+
+            <div>
+                <strong>0–100</strong>
+                <span>Focus score, per student, per session</span>
+            </div>
+
+            <div>
+                <strong>Live</strong>
+                <span>Teacher dashboard &amp; flag alerts</span>
+            </div>
+
+            <div>
+                <strong>PDF / XLS</strong>
+                <span>Attendance &amp; usage exports</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-visual">
+
+        <div class="viewfinder scan-card" data-reveal>
+
+            <span class="vf-bl" aria-hidden="true"></span>
+            <span class="vf-br" aria-hidden="true"></span>
+            <span class="vf-scanline" aria-hidden="true"></span>
+
+            <div class="scan-card-inner">
+
+                <p class="scan-label">
+                    SESSION // CS-402 · 10:05 AM
+                </p>
+
+                <ul class="focus-bars" aria-hidden="true">
+
+                    <li style="--h:82%">
+                        <span></span>
+                        <em>Notes app</em>
+                    </li>
+
+                    <li style="--h:35%">
+                        <span></span>
+                        <em>Idle</em>
+                    </li>
+
+                    <li style="--h:91%">
+                        <span></span>
+                        <em>Reference</em>
+                    </li>
+
+                    <li style="--h:20%">
+                        <span></span>
+                        <em>Social</em>
+                    </li>
+
+                    <li style="--h:74%">
+                        <span></span>
+                        <em>PDF reader</em>
+                    </li>
+
+                    <li style="--h:88%">
+                        <span></span>
+                        <em>Notes app</em>
+                    </li>
+
+                </ul>
+
+
+                <div class="scan-readout">
+
+                    <span>Focus score</span>
+
+                    <strong>
+                        78<em>/100</em>
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+<!-- =====================================================
+     HOW IT WORKS
+===================================================== -->
+
+<section id="features" class="section">
+<span id="how-it-works"></span>
+
+<div class="container">
+
+    <span class="eyebrow">
+        The pipeline
+    </span>
+
+    <h2 class="section-title">
+        One scan starts three things happening at once.
+    </h2>
+
+
+    <div class="steps">
+
+        <div class="step" data-reveal>
+
+            <span class="step-index">01</span>
+
+            <h3>
+                Scan to check in
+            </h3>
+
+            <p>
+                Each student's registered device scans the session QR code.
+                Attendance is logged instantly and tied to that device —
+                no proxy marking.
+            </p>
+
+        </div>
+
+
+        <div class="step" data-reveal>
+
+            <span class="step-index">02</span>
+
+            <h3>
+                Classify in the background
+            </h3>
+
+            <p>
+                A lightweight monitor logs foreground app switches during class.
+                The AI model scores each one educational or non-educational,
+                with a confidence value.
+            </p>
+
+        </div>
+
+
+        <div class="step" data-reveal>
+
+            <span class="step-index">03</span>
+
+            <h3>
+                Surface it live
+            </h3>
+
+            <p>
+                Scores roll up into a per-student focus number.
+                Teachers see it update on their dashboard;
+                students get a nudge if they drift too long.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+<!-- =====================================================
+     ROLES
+===================================================== -->
+
+<section id="roles" class="section section-dark">
+
+
+<div class="container">
+
+    <span class="eyebrow">
+        Who it's for
+    </span>
+
+    <h2 class="section-title">
+        Three roles, one shared session.
+    </h2>
+
+
+    <div class="role-cards">
+
+
+        <!-- STUDENT -->
+
+        <article class="role-card" data-reveal>
+
+            <h3>
+                Student
+            </h3>
+
+            <p>
+                Register your device once. Scan in each session.
+                See your own focus trend and get warned before it becomes a flag.
+            </p>
+
+            <a href="{% url 'register' %}?role=student">
+                Register as Student
+            </a>
+
+        </article>
+
+
+        <!-- TEACHER -->
+
+        <article class="role-card" data-reveal>
+
+            <h3>
+                Teacher
+            </h3>
+
+            <p>
+                Open a session, watch attendance fill in,
+                and get an alert the moment a student drifts into
+                non-educational use for too long.
+            </p>
+
+            <a href="{% url 'register' %}?role=teacher">
+                Register as Teacher
+            </a>
+
+        </article>
+
+
+        <!-- ADMIN -->
+
+        <article class="role-card" data-reveal>
+
+            <h3>
+                Admin
+            </h3>
+
+            <p>
+                Manage every student and teacher account,
+                and export attendance and usage analytics
+                as PDF or Excel whenever the department asks.
+            </p>
+
+            <a href="{% url 'register' %}?role=admin">
+                Create admin account →
+            </a>
+
+        </article>
+
+    </div>
+
+</div>
+
+
+</section>
+
+<!-- =====================================================
+     PROGRAM / PROJECT CONTEXT
+===================================================== -->
+
+<section id="about" class="section">
+<span id="program"></span>
+
+
+<div class="container program-grid">
+
+
+    <div>
+
+        <span class="eyebrow">
+            About the project
+        </span>
+
+        <h2 class="section-title">
+            Built for classrooms where the phone is
+            both the tool and the temptation.
+        </h2>
+
+        <p class="program-copy">
+
+            FocusFrame doesn't block devices outright —
+            it tells the difference between a student reading
+            lecture notes and one scrolling somewhere else,
+            then hands that distinction to the teacher as a
+            live number instead of a guess.
+
+        </p>
+
+    </div>
+
+
+    <dl class="program-facts">
+
+        <div>
+            <dt>Domain</dt>
+            <dd>
+                AI · Mobile Computing · EdTech · Data Analytics
+            </dd>
+        </div>
+
+
+        <div>
+            <dt>Attendance</dt>
+            <dd>
+                QR-code check-in, tied to a registered device
+            </dd>
+        </div>
+
+
+        <div>
+            <dt>Classification</dt>
+            <dd>
+                Educational vs. non-educational,
+                with confidence score
+            </dd>
+        </div>
+
+
+        <div>
+            <dt>Reports</dt>
+            <dd>
+                PDF / Excel export for teachers and admins
+            </dd>
+        </div>
+
+    </dl>
+
+</div>
+
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'js/shared.js' %}"></script>
+
+<script src="{% static 'js/script.js' %}"></script>
+
+{% endblock %}

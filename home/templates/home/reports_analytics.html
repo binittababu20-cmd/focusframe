@@ -1,0 +1,626 @@
+{% extends "home/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Reports &amp; Analytics - FocusFrame
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .reports-container {
+        max-width: 1300px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    .reports-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .reports-header h1 {
+        font-size: 28px;
+        color: #10132B;
+        margin-bottom: 4px;
+    }
+
+    .reports-header p {
+        color: #687083;
+        font-size: 14px;
+    }
+
+    .export-btn-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-export {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 15px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        color: white;
+        background: #3e63dd;
+        transition: background 0.2s;
+    }
+
+    .btn-export:hover {
+        background: #2b4ec8;
+    }
+
+    .btn-export-green {
+        background: #16803c;
+    }
+
+    .btn-export-green:hover {
+        background: #11652f;
+    }
+
+    .btn-export-purple {
+        background: #7c3aed;
+    }
+
+    .btn-export-purple:hover {
+        background: #6226cf;
+    }
+
+    /* Filter Form */
+    .filter-card {
+        background: #ffffff;
+        border: 1px solid #e4e7ef;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 6px rgba(16, 19, 43, 0.04);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px 90px;
+        gap: 15px;
+        align-items: flex-end;
+    }
+
+    .filter-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #4a5568;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        font-size: 14px;
+        background: #fff;
+    }
+
+    .btn-filter {
+        padding: 10px 18px;
+        background: #10132B;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-filter:hover {
+        background: #1e2454;
+    }
+
+    .btn-reset {
+        padding: 10px 14px;
+        background: #f1f3f9;
+        color: #4a5568;
+        border: 1px solid #cbd5e0;
+        border-radius: 6px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .btn-reset:hover {
+        background: #e2e8f0;
+    }
+
+    /* Stat Cards */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .report-stat-card {
+        background: #ffffff;
+        border: 1px solid #e4e7ef;
+        border-radius: 12px;
+        padding: 18px 20px;
+        box-shadow: 0 2px 6px rgba(16, 19, 43, 0.04);
+    }
+
+    .report-stat-card h3 {
+        font-size: 12px;
+        font-weight: 700;
+        color: #687083;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .report-stat-card .stat-value {
+        font-size: 26px;
+        font-weight: 800;
+        color: #10132B;
+    }
+
+    /* Tabs */
+    .report-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e4e7ef;
+        padding-bottom: 2px;
+        overflow-x: auto;
+    }
+
+    .report-tab-btn {
+        padding: 10px 20px;
+        border-radius: 8px 8px 0 0;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        color: #687083;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .report-tab-btn.active {
+        color: #3e63dd;
+        background: #ffffff;
+        border-bottom: 3px solid #3e63dd;
+    }
+
+    .report-tab-btn:hover {
+        color: #10132B;
+    }
+
+    /* Tables */
+    .table-container {
+        background: #ffffff;
+        border: 1px solid #e4e7ef;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(16, 19, 43, 0.04);
+        margin-bottom: 30px;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        min-width: 800px;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: #f8fafc;
+        color: #4a5568;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .data-table td {
+        padding: 14px 18px;
+        color: #10132B;
+        font-size: 14px;
+        border-bottom: 1px solid #edf2f7;
+        vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover td {
+        background: #f8faff;
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .badge-success { background: #e9f8ef; color: #16803c; }
+    .badge-danger { background: #ffe9eb; color: #d94b5b; }
+    .badge-warning { background: #fff4dc; color: #b26a00; }
+    .badge-neutral { background: #f1f3f9; color: #687083; }
+
+    .empty-state {
+        padding: 40px 20px;
+        text-align: center;
+        color: #8c95a6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+
+    <!-- HEADER & ACTIONS -->
+    <div class="reports-header">
+        <div>
+            <h1>📊 Reports &amp; Analytics</h1>
+            <p>Sprint 5: Student Attendance, Phone Usage, and Focus Intelligence Reports</p>
+        </div>
+
+        <div class="export-btn-group">
+            <a href="{% url 'export_attendance_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}&classroom={{ selected_classroom }}&session_id={{ selected_session }}"
+               class="btn-export btn-export-green">
+                📥 Export Attendance (CSV)
+            </a>
+
+            <a href="{% url 'export_usage_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}&classroom={{ selected_classroom }}&session_id={{ selected_session }}"
+               class="btn-export">
+                📥 Export Usage (CSV)
+            </a>
+
+            <a href="{% url 'export_focus_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}&classroom={{ selected_classroom }}&session_id={{ selected_session }}"
+               class="btn-export btn-export-purple">
+                📥 Export Focus Scores (CSV)
+            </a>
+
+            <a href="{% url 'teacher_dashboard' %}" class="btn-reset">
+                ← Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- T5: DATE-WISE & SESSION FILTERING -->
+    <div class="filter-card">
+        <form method="GET" action="{% url 'reports_analytics' %}">
+            <input type="hidden" name="tab" value="{{ active_tab }}">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="start_date">From Date</label>
+                    <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="end_date">To Date</label>
+                    <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="classroom">Classroom</label>
+                    <select id="classroom" name="classroom">
+                        <option value="">All Classrooms</option>
+                        {% for c in classrooms %}
+                            <option value="{{ c }}" {% if selected_classroom == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="session_id">Session</label>
+                    <select id="session_id" name="session_id">
+                        <option value="">All Sessions</option>
+                        {% for s in all_sessions_list %}
+                            <option value="{{ s.id }}" {% if selected_session == s.id %}selected{% endif %}>{{ s.classroom }} ({{ s.id|slice:":8" }}...)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-filter">Filter</button>
+                <a href="{% url 'reports_analytics' %}?tab={{ active_tab }}" class="btn-reset">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- SUMMARY STATS CARDS -->
+    <div class="stats-row">
+        <div class="report-stat-card">
+            <h3>Total Sessions</h3>
+            <div class="stat-value">{{ reports|length }}</div>
+        </div>
+
+        <div class="report-stat-card">
+            <h3>Total Attendance</h3>
+            <div class="stat-value">{{ total_attendance }}</div>
+        </div>
+
+        <div class="report-stat-card">
+            <h3>Usage Interactions</h3>
+            <div class="stat-value">{{ total_interactions }}</div>
+        </div>
+
+        <div class="report-stat-card">
+            <h3>Average Focus Score</h3>
+            <div class="stat-value">
+                {% if avg_focus_score != None %}
+                    {{ avg_focus_score }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SPRINT 5 TABS -->
+    <div class="report-tabs">
+        <button type="button" class="report-tab-btn {% if active_tab == 'overview' %}active{% endif %}" onclick="switchTab('overview')">
+            📋 Session Overview ({{ reports|length }})
+        </button>
+        <button type="button" class="report-tab-btn {% if active_tab == 'attendance' %}active{% endif %}" onclick="switchTab('attendance')">
+            👥 Attendance Report (T2) ({{ attendance_records|length }})
+        </button>
+        <button type="button" class="report-tab-btn {% if active_tab == 'usage' %}active{% endif %}" onclick="switchTab('usage')">
+            📱 Phone Usage Report (T3) ({{ usage_records|length }})
+        </button>
+        <button type="button" class="report-tab-btn {% if active_tab == 'focus' %}active{% endif %}" onclick="switchTab('focus')">
+            🎯 Student Focus Report (T4) ({{ student_focus_reports|length }})
+        </button>
+    </div>
+
+    <!-- TAB 1: SESSION OVERVIEW -->
+    <div id="tab-overview" class="tab-pane" style="{% if active_tab != 'overview' %}display:none;{% endif %}">
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Classroom</th>
+                            <th>Session Date &amp; Time</th>
+                            <th>Status</th>
+                            <th>Attendance</th>
+                            <th>Educational</th>
+                            <th>Non-Educational</th>
+                            <th>Focus Score</th>
+                            <th>Alerts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td><strong>{{ report.classroom }}</strong></td>
+                            <td>{{ report.session_time }}</td>
+                            <td>
+                                {% if report.active %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <span class="badge badge-neutral">Completed</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge badge-success">{{ report.attendance_count }} present</span></td>
+                            <td>{{ report.educational_seconds }}s</td>
+                            <td>{{ report.non_educational_seconds }}s</td>
+                            <td>
+                                {% if report.focus_score != None %}
+                                    {% if report.focus_score >= 75 %}
+                                        <span class="badge badge-success">{{ report.focus_score }}%</span>
+                                    {% elif report.focus_score >= 50 %}
+                                        <span class="badge badge-warning">{{ report.focus_score }}%</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">{{ report.focus_score }}%</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge badge-neutral">No Data</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if report.alert_count > 0 %}
+                                    <span class="badge badge-danger">{{ report.alert_count }} Alerts</span>
+                                {% else %}
+                                    <span class="badge badge-neutral">0</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                No sessions found matching your filter criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: T2 ATTENDANCE REPORT -->
+    <div id="tab-attendance" class="tab-pane" style="{% if active_tab != 'attendance' %}display:none;{% endif %}">
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            <th>Classroom</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for att in attendance_records %}
+                        <tr>
+                            <td><strong>{{ att.student_name }}</strong></td>
+                            <td><code>{{ att.student_id }}</code></td>
+                            <td>{{ att.classroom }}</td>
+                            <td>{{ att.date }}</td>
+                            <td>{{ att.time }}</td>
+                            <td><span class="badge badge-success">✓ {{ att.status }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                No attendance records found matching your filter criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: T3 PHONE USAGE REPORT -->
+    <div id="tab-usage" class="tab-pane" style="{% if active_tab != 'usage' %}display:none;{% endif %}">
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Classroom</th>
+                            <th>App Name</th>
+                            <th>Package Name</th>
+                            <th>Category</th>
+                            <th>Duration (Sec)</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in usage_records %}
+                        <tr>
+                            <td><code>{{ u.student_id }}</code></td>
+                            <td>{{ u.classroom }}</td>
+                            <td><strong>{{ u.app_name }}</strong></td>
+                            <td><small style="color: #687083;">{{ u.package_name }}</small></td>
+                            <td>
+                                {% if u.category|lower == 'educational' %}
+                                    <span class="badge badge-success">Educational</span>
+                                {% else %}
+                                    <span class="badge badge-danger">{{ u.category }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ u.duration }}s</td>
+                            <td>{{ u.timestamp }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No phone usage logs recorded for the selected filter.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: T4 STUDENT FOCUS SCORES REPORT -->
+    <div id="tab-focus" class="tab-pane" style="{% if active_tab != 'focus' %}display:none;{% endif %}">
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            <th>Educational Usage</th>
+                            <th>Non-Educational Usage</th>
+                            <th>Total Usage</th>
+                            <th>Focus Score</th>
+                            <th>Focus Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sf in student_focus_reports %}
+                        <tr>
+                            <td><strong>{{ sf.student_name }}</strong></td>
+                            <td><code>{{ sf.student_id }}</code></td>
+                            <td>{{ sf.educational_seconds }}s</td>
+                            <td>{{ sf.non_educational_seconds }}s</td>
+                            <td>{{ sf.total_seconds }}s</td>
+                            <td>
+                                <strong>{{ sf.focus_score }}%</strong>
+                            </td>
+                            <td>
+                                {% if sf.focus_level == 'Focused' %}
+                                    <span class="badge badge-success">Focused</span>
+                                {% elif sf.focus_level == 'Moderate' %}
+                                    <span class="badge badge-warning">Moderate</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Distracted</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No student focus calculations available for this filter.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.report-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    const activeEl = document.getElementById('tab-' + tabName);
+    if (activeEl) {
+        activeEl.style.display = 'block';
+    }
+
+    event.currentTarget.classList.add('active');
+
+    // Update form's hidden input
+    const tabInput = document.querySelector('input[name="tab"]');
+    if (tabInput) {
+        tabInput.value = tabName;
+    }
+}
+</script>
+{% endblock %}

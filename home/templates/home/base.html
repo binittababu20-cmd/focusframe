@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FocusFrame - AI-Based Classroom Attendance & Mobile Phone Usage Monitoring System with Focus Intelligence">
+
+    <title>{% block title %}FocusFrame - Classroom Focus Intelligence{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/shared.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- COMMON HEADER -->
+<header class="main-header">
+    <div class="header-container">
+        <!-- LOGO -->
+        <a href="{% url 'home' %}" class="header-logo">
+            <div class="logo-icon">🎯</div>
+            <div class="logo-text">
+                <span class="logo-name">FocusFrame</span>
+                <span class="logo-tagline">Focus Intelligence</span>
+            </div>
+        </a>
+
+        <!-- NAVIGATION -->
+        <nav class="main-nav">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'home' %}#features">Features</a>
+            <a href="{% url 'home' %}#about">About</a>
+
+            {% if user.is_authenticated %}
+    {% if request.session.role == 'student' %}
+        <a href="{% url 'student_dashboard' %}" class="nav-login" style="font-weight: 600;">
+            Student Dashboard ({{ request.user.username }})
+        </a>
+    {% elif request.session.role == 'admin' %}
+        <a href="{% url 'admin_dashboard' %}" class="nav-login" style="font-weight: 600;">
+            Admin Dashboard ({{ request.user.username }})
+        </a>
+    {% elif request.session.role == 'teacher' %}
+        <a href="{% url 'teacher_dashboard' %}" class="nav-login" style="font-weight: 600;">
+            Teacher Dashboard ({{ request.user.username }})
+        </a>
+    {% else %}
+        {% if user.is_staff or user.is_superuser %}
+            <a href="{% url 'admin_dashboard' %}" class="nav-login" style="font-weight: 600;">
+                Admin Dashboard ({{ request.user.username }})
+            </a>
+        {% else %}
+            <a href="{% url 'student_dashboard' %}" class="nav-login" style="font-weight: 600;">
+                Dashboard ({{ request.user.username }})
+            </a>
+        {% endif %}
+    {% endif %}
+    <a href="{% url 'logout' %}" class="nav-register nav-logout">
+        Logout
+    </a>
+{% else %}
+    <a href="{% url 'login' %}" class="nav-login">Sign In</a>
+    <a href="{% url 'register' %}" class="nav-register">Get Started</a>
+{% endif %}
+        </nav>
+    </div>
+</header>
+
+<!-- PAGE CONTENT -->
+<main class="page-content">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- COMMON FOOTER -->
+<footer class="main-footer">
+    <div class="footer-container">
+        <div>
+            <strong>FocusFrame</strong>
+            <p>AI-Based Classroom Attendance &amp; Mobile Usage Monitoring System</p>
+        </div>
+        <div class="footer-copy">
+            © 2026 FocusFrame. All rights reserved.
+        </div>
+    </div>
+</footer>
+</body>
+</html>

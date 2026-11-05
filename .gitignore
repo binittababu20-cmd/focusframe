@@ -1,0 +1,40 @@
+# Sensitive files
+firebase-key.json
+db.sqlite3
+.env
+.env.*
+
+# Private data
+device_data.json
+student_data.json
+teacher_requests.json
+
+# Backups and cache
+backups/
+.pytest_cache/
+.vscode/
+venv/
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Other environments
+env/
+
+# Generated backup model
+focus_model_demo_backup.joblib
+
+# Android generated files and local configuration
+FocusFrameMonitor/.gradle/
+FocusFrameMonitor/.kotlin/
+FocusFrameMonitor/**/build/
+FocusFrameMonitor/**/release/
+FocusFrameMonitor/local.properties
+FocusFrameMonitor/**/google-services.json
+# Private FocusFrame training data
+data/focus_training/usage_records_anonymized_*.csv
+data/focus_training/dataset_manifest_*.json
+data/focus_training/dataset_audit_report_*.md
+data/focus_training/session_review_worksheet_*
+
+data/focus_training/session_label_template_*.csv

@@ -1,0 +1,2909 @@
+{% extends "home/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Teacher Dashboard - FocusFrame
+{% endblock %}
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'css/style.css' %}"
+>
+
+<link
+    rel="stylesheet"
+    href="{% static 'css/dashboard.css' %}"
+>
+
+<style>
+
+    /* =====================================================
+       TEACHER DASHBOARD
+    ====================================================== */
+
+    .dashboard {
+        display: flex !important;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        flex-shrink: 0;
+    }
+
+    .content {
+        flex: 1 !important;
+        min-width: 0;
+        padding: 40px !important;
+        color: #10132B;
+    }
+
+
+    /* =====================================================
+       STATISTICS
+    ====================================================== */
+
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    .stat-card {
+        display: flex;
+        visibility: visible;
+        opacity: 1;
+    }
+
+
+    /* =====================================================
+       GENERAL CARDS
+    ====================================================== */
+
+    .session-card,
+    .activity-card {
+        margin-bottom: 25px;
+    }
+
+
+    /* =====================================================
+       STUDENT MONITORING TABLE
+    ====================================================== */
+
+    .monitoring-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .monitoring-table {
+        width: 100%;
+        min-width: 1050px;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    .monitoring-table th {
+        text-align: left;
+        padding: 12px 16px;
+        color: #687083;
+        font-size: 13px;
+        font-weight: 700;
+        border-bottom: 1px solid #e4e7ef;
+    }
+
+    .monitoring-table td {
+        padding: 15px 16px;
+        background: #ffffff;
+        border-top: 1px solid #e4e7ef;
+        border-bottom: 1px solid #e4e7ef;
+        vertical-align: middle;
+    }
+
+    .monitoring-table td:first-child {
+        border-left: 1px solid #e4e7ef;
+        border-radius: 10px 0 0 10px;
+    }
+
+    .monitoring-table td:last-child {
+        border-right: 1px solid #e4e7ef;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .monitoring-table tbody tr:hover td {
+        background: #f8f9ff;
+    }
+
+
+    /* =====================================================
+       STUDENT NAME
+    ====================================================== */
+
+    .student-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 190px;
+    }
+
+    .student-avatar {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef2ff;
+        color: #3e63dd;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .student-name-cell strong,
+    .student-info strong {
+        display: block;
+        color: #10132B;
+    }
+
+    .student-name-cell small,
+    .student-info small {
+        display: block;
+        color: #687083;
+        margin-top: 3px;
+    }
+
+    /* Student info wrapper to ensure vertical layout */
+    .student-info {
+        display: block;
+    }
+
+
+    /* =====================================================
+       STATUS BADGES
+    ====================================================== */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-present {
+        background: #e9f8ef;
+        color: #16803c;
+    }
+
+    .status-absent {
+        background: #f2f3f5;
+        color: #687083;
+    }
+
+    .status-focused {
+        background: #e9f8ef;
+        color: #16803c;
+    }
+
+    .status-moderate {
+        background: #fff4dc;
+        color: #b26a00;
+    }
+
+    .status-low {
+        background: #ffe9eb;
+        color: #d94b5b;
+    }
+
+    .status-no-data {
+        background: #f2f3f5;
+        color: #687083;
+    }
+
+
+    /* =====================================================
+       FOCUS SCORE
+    ====================================================== */
+
+    .focus-score {
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .focus-score-high {
+        color: #16803c;
+    }
+
+    .focus-score-medium {
+        color: #b26a00;
+    }
+
+    .focus-score-low {
+        color: #d94b5b;
+    }
+
+    .focus-score-none {
+        color: #687083;
+    }
+
+
+    /* =====================================================
+       APPS USED
+    ====================================================== */
+
+    .apps-used {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        max-width: 210px;
+    }
+
+    .app-chip {
+        display: inline-block;
+        padding: 5px 8px;
+        background: #f1f4ff;
+        color: #3e63dd;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .app-count {
+        color: #687083;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+
+    /* =====================================================
+       PHONE INTERACTION
+    ====================================================== */
+
+    .interaction-count {
+        font-size: 18px;
+        font-weight: 800;
+        color: #10132B;
+    }
+
+    .interaction-label {
+        color: #687083;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+
+    /* =====================================================
+       EMPTY DATA
+    ====================================================== */
+
+    .empty-data {
+        text-align: center;
+        padding: 40px 30px;
+        color: #687083;
+    }
+
+    .empty-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+
+    /* =====================================================
+       PHONE USAGE TABLE
+    ====================================================== */
+
+    .usage-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .usage-table {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+    }
+
+    .usage-table th {
+        text-align: left;
+        padding: 14px;
+        color: #687083;
+        font-size: 13px;
+        border-bottom: 1px solid #e4e7ef;
+    }
+
+    .usage-table td {
+        padding: 14px;
+        border-bottom: 1px solid #eef0f5;
+    }
+
+    .usage-table tr:hover td {
+        background: #f8f9ff;
+    }
+
+
+    /* =====================================================
+       CATEGORY
+    ====================================================== */
+
+    .category-educational {
+        color: #16803c;
+        font-weight: 700;
+    }
+
+    .category-other {
+        color: #687083;
+        font-weight: 600;
+    }
+
+
+    /* =====================================================
+       MONITORING BUTTON
+    ====================================================== */
+
+    .monitor-btn {
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        background: #10132B;
+        color: white;
+    }
+
+    .monitor-btn:hover {
+        opacity: 0.9;
+    }
+
+
+    /* =====================================================
+       SESSION BADGE
+    ====================================================== */
+
+    .session-badge {
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       TIMESTAMP
+    ====================================================== */
+
+    .timestamp-value {
+        white-space: nowrap;
+        color: #444;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ====================================================== */
+
+    @media (max-width: 1100px) {
+
+        .dashboard-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .content {
+            padding: 30px !important;
+        }
+    }
+
+
+    @media (max-width: 700px) {
+
+        .dashboard {
+            display: block !important;
+        }
+
+        .content {
+            padding: 20px !important;
+        }
+
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    /* =====================================================
+       VIEW SWITCHER PILLS
+    ====================================================== */
+
+    .view-switcher-container {
+        margin: 0 0 24px 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .view-switcher {
+        display: inline-flex;
+        gap: 8px;
+        background: #f1f4ff;
+        padding: 6px;
+        border-radius: 14px;
+        flex-wrap: nowrap;
+        min-width: max-content;
+    }
+
+    .view-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border-radius: 10px;
+        border: none;
+        background: transparent;
+        color: #687083;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+        white-space: nowrap;
+        font-family: inherit;
+    }
+
+    .view-pill:hover {
+        background: rgba(62, 99, 221, 0.08);
+        color: #3e63dd;
+    }
+
+    .view-pill.active {
+        background: #ffffff;
+        color: #3e63dd;
+        box-shadow: 0 2px 8px rgba(62, 99, 221, 0.15);
+        font-weight: 700;
+    }
+
+    .pill-count {
+        background: #e8edff;
+        color: #3e63dd;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .view-pill.active .pill-count {
+        background: #3e63dd;
+        color: #fff;
+    }
+
+
+    /* =====================================================
+       ACTIVE VIEW BANNER
+    ====================================================== */
+
+    .active-view-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #eef2ff 0%, #f5f0ff 100%);
+        border: 1px solid #c7d2fe;
+        border-radius: 12px;
+        margin-bottom: 24px;
+    }
+
+    .active-view-banner-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .active-view-badge {
+        background: #3e63dd;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+
+    .btn-show-all {
+        background: #3e63dd;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        transition: opacity 0.15s;
+    }
+
+    .btn-show-all:hover {
+        opacity: 0.88;
+    }
+
+
+    /* Hidden section
+    ====================================================== */
+
+    .view-panel.view-hidden,
+    .dashboard-stats.view-hidden,
+    section.view-hidden,
+    div.view-hidden {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard">
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>
+                FocusFrame
+            </h2>
+
+            <p>
+                Teacher Panel
+            </p>
+
+        </div>
+
+        <div style="margin: 15px 0 20px 0; padding: 12px 14px; background: rgba(255, 255, 255, 0.08); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a0aec0; margin-bottom: 4px;">Logged in as</div>
+            <div style="font-weight: 700; color: #ffffff; font-size: 14px; word-break: break-all;">{{ request.user.username }}</div>
+            <span style="display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #3e63dd; color: #ffffff;">Teacher</span>
+        </div>
+
+
+        <nav>
+
+            <a href="#all" id="nav-all" class="active" onclick="switchTeacherView('all'); return false;">
+                🏠 Overview
+            </a>
+
+            <a href="#focusscore" id="nav-focus" onclick="switchTeacherView('focus'); return false;">
+                🎯 Focus Score (Only)
+            </a>
+
+            <a href="#attendance" id="nav-attendance" onclick="switchTeacherView('attendance'); return false;">
+                📋 Attendance (Only)
+            </a>
+
+            <a href="#studentreport" id="nav-student-report" onclick="switchTeacherView('student-report'); return false;">
+                👥 Student Report (Only)
+            </a>
+
+            <a href="#phoneusage" id="nav-phone-usage" onclick="switchTeacherView('phone-usage'); return false;">
+                📱 Phone Usage (Only)
+            </a>
+
+            <a href="#monitoring" id="nav-monitoring" onclick="switchTeacherView('monitoring'); return false;">
+                📊 Live Monitoring
+            </a>
+
+            <a href="{% url 'reports_analytics' %}">
+                📈 Analytics & Reports
+            </a>
+
+            <a href="{% url 'logout' %}">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =================================================
+         MAIN CONTENT
+    ================================================== -->
+
+    <main class="content">
+
+        {% if messages %}
+        <div style="margin-bottom: 25px;">
+            {% for message in messages %}
+                <div style="
+                    padding: 14px 20px;
+                    margin-bottom: 12px;
+                    border-radius: 10px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    {% if message.tags == 'error' or 'Access denied' in message.message %}
+                        background: #ffe9eb;
+                        color: #d94b5b;
+                        border: 1px solid #ffd0d6;
+                    {% elif message.tags == 'success' %}
+                        background: #e9f8ef;
+                        color: #16803c;
+                        border: 1px solid #c7eed6;
+                    {% else %}
+                        background: #fff4dc;
+                        color: #b26a00;
+                        border: 1px solid #ffe3a3;
+                    {% endif %}
+                ">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 18px;">⚠️</span>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% if 'student' in message.message and 'teacher' in message.message %}
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{% url 'logout' %}?next={% url 'login' %}?role=student" style="
+                                background: #d94b5b;
+                                color: white;
+                                padding: 7px 16px;
+                                border-radius: 6px;
+                                text-decoration: none;
+                                font-size: 12px;
+                                font-weight: 700;
+                            ">Switch to Student Login</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Teacher Dashboard
+                </h1>
+
+                <p>
+                    Classroom Focus Intelligence
+                </p>
+
+            </div>
+
+        </header>
+
+        <!-- =================================================
+             VIEW SWITCHER BAR (FOCUS SCORE, ATTENDANCE, STUDENT REPORT)
+        ================================================== -->
+        <div class="view-switcher-container">
+            <div class="view-switcher">
+                <button type="button" class="view-pill active" id="pill-all" onclick="switchTeacherView('all')">
+                    🏠 All Overview
+                </button>
+                <button type="button" class="view-pill" id="pill-focus" onclick="switchTeacherView('focus')">
+                    🎯 Focus Score <span class="pill-count">Only</span>
+                </button>
+                <button type="button" class="view-pill" id="pill-attendance" onclick="switchTeacherView('attendance')">
+                    📋 Attendance <span class="pill-count">Only</span>
+                </button>
+                <button type="button" class="view-pill" id="pill-student-report" onclick="switchTeacherView('student-report')">
+                    👥 Student Report <span class="pill-count">Only</span>
+                </button>
+                <button type="button" class="view-pill" id="pill-phone-usage" onclick="switchTeacherView('phone-usage')">
+                    📱 Phone Usage <span class="pill-count">Only</span>
+                </button>
+                <button type="button" class="view-pill" id="pill-monitoring" onclick="switchTeacherView('monitoring')">
+                    📊 Live Monitoring
+                </button>
+            </div>
+        </div>
+
+        <!-- ACTIVE ISOLATED VIEW BANNER -->
+        <div id="active-view-banner" class="active-view-banner" style="display: none;">
+            <div class="active-view-banner-content">
+                <span class="active-view-badge" id="active-view-badge">Isolated View</span>
+                <strong id="active-view-text" style="color: #1e1b4b; font-size: 14px;">Showing Focus Score Only</strong>
+                <span style="color: #64748b; font-size: 13px;">— Other sections are hidden</span>
+            </div>
+            <button type="button" class="btn-show-all" onclick="switchTeacherView('all')">
+                ✕ Show All Sections
+            </button>
+        </div>
+
+
+
+        <!-- =================================================
+             TOP STATISTICS
+        ================================================== -->
+
+        <section
+            class="dashboard-stats view-panel"
+            id="overview-stats-section"
+            data-view="all"
+        >
+
+
+            <!-- STUDENTS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👥
+                </div>
+
+                <div class="stat-info">
+
+                    <h3>
+                        Students
+                    </h3>
+
+                    <h2>
+                        {{ total_students }}
+                    </h2>
+
+                    <p>
+                        Registered students
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- CONNECTED DEVICES -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📱
+                </div>
+
+                <div class="stat-info">
+
+                    <h3>
+                        Connected Devices
+                    </h3>
+
+                    <h2>
+                        {{ connected_devices }}
+                    </h2>
+
+                    <p>
+                        Registered devices
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- READY -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🎯
+                </div>
+
+                <div class="stat-info">
+
+                    <h3>
+                        Devices Ready
+                    </h3>
+
+                    <h2>
+                        {{ students_with_devices }}
+                    </h2>
+
+                    <p>
+                        Students with devices
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- NO DEVICE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📴
+                </div>
+
+                <div class="stat-info">
+
+                    <h3>
+                        No Device
+                    </h3>
+
+                    <h2>
+                        {{ students_without_devices }}
+                    </h2>
+
+                    <p>
+                        Students without devices
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             CLASSROOM MONITORING
+        ================================================== -->
+
+        <section
+            class="session-card view-panel"
+            id="monitoring-card"
+            data-view="monitoring"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Classroom Monitoring
+                    </h2>
+
+                    <p>
+                        Start a classroom session and monitor
+                        student attendance and phone activity.
+                    </p>
+
+                </div>
+
+
+                <span class="session-badge">
+
+                    {% if monitoring_active %}
+
+                        ● Active
+
+                    {% else %}
+
+                        ● Ready
+
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+
+            <div class="session-details">
+
+
+                <div class="session-row">
+
+                    <span>
+                        Class
+                    </span>
+
+                    <strong>
+                        {{ active_class }}
+                    </strong>
+
+                </div>
+
+
+
+                <div class="session-row">
+
+                    <span>
+                        Session Time
+                    </span>
+
+                    <strong>
+                        {{ session_time }}
+                    </strong>
+
+                </div>
+
+
+
+                <div class="session-row">
+
+                    <span>
+                        Monitoring
+                    </span>
+
+                    {% if monitoring_active %}
+
+                        <strong class="status-success">
+                            Active
+                        </strong>
+
+                    {% else %}
+
+                        <strong class="status-offline">
+                            Not active
+                        </strong>
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+
+            {% if monitoring_active %}
+
+
+                <!-- STOP MONITORING -->
+
+                <form
+                    method="POST"
+                    action="{% url 'stop_monitoring' %}"
+                    style="margin-top: 20px;"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="monitor-btn"
+                        style="background:#e5697b;"
+                    >
+                        ⏹️ Stop Monitoring
+                    </button>
+
+                </form>
+
+
+
+                <!-- QR CODE -->
+
+                <div
+                    style="
+                        margin-top:25px;
+                        padding:25px;
+                        background:#ffffff;
+                        border-radius:16px;
+                        text-align:center;
+                        border:2px dashed #3e63dd;
+                        box-shadow:0 4px 15px rgba(62,99,221,0.1);
+                    "
+                >
+
+                    <h3
+                        style="
+                            margin-top:0;
+                            color:#10132B;
+                            font-size:20px;
+                        "
+                    >
+                        📷 Session Check-In QR Code
+                    </h3>
+
+
+                    <p
+                        style="
+                            color:#687083;
+                            margin-bottom:15px;
+                        "
+                    >
+                        Display this QR code to your class
+                        for attendance check-in.
+                    </p>
+
+
+                    <img
+                        src="data:image/png;base64,{{ qr_image_b64 }}"
+                        alt="Session QR Code"
+                        style="
+                            border-radius:12px;
+                            border:4px solid #f1f4ff;
+                            box-shadow:0 8px 25px rgba(0,0,0,0.1);
+                        "
+                    >
+
+
+                    <p
+                        style="
+                            margin-bottom:0;
+                            margin-top:12px;
+                            font-weight:700;
+                            color:#3e63dd;
+                            font-family:monospace;
+                            font-size:16px;
+                        "
+                    >
+                        Session ID: {{ session_id }}
+                    </p>
+
+                </div>
+
+
+            {% else %}
+
+
+                <!-- START MONITORING -->
+
+                <form
+                    method="POST"
+                    action="{% url 'start_monitoring' %}"
+                    style="margin-top:20px;"
+                >
+
+                    {% csrf_token %}
+
+                    <!-- Classroom / Subject Name Input -->
+                    <div style="margin-bottom:12px;">
+                        <label
+                            for="classroom_name"
+                            style="display:block;font-weight:600;margin-bottom:6px;color:#10132B;font-size:14px;"
+                        >
+                            Subject / Classroom
+                        </label>
+                        <input
+                            type="text"
+                            id="classroom_name"
+                            name="classroom_name"
+                            placeholder="e.g. CS-402 Mobile Computing"
+                            maxlength="100"
+                            style="
+                                width:100%;
+                                padding:10px 14px;
+                                border:1px solid #d0d5dd;
+                                border-radius:8px;
+                                font-size:14px;
+                                box-sizing:border-box;
+                            "
+                        >
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="monitor-btn"
+                    >
+                        ▶️ Start Monitoring
+                    </button>
+
+                </form>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             LIVE CLASSROOM OVERVIEW
+        ================================================== -->
+
+        <section
+            class="activity-card view-panel"
+            id="live-overview-section"
+            data-view="monitoring"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Live Classroom Overview
+                    </h2>
+
+                    <p>
+                        Current attendance and classroom
+                        monitoring statistics.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="dashboard-stats">
+
+
+                <!-- FOCUSED -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🎯
+                    </div>
+
+                    <div class="stat-info">
+
+                        <h3>
+                            Focused
+                        </h3>
+
+                        <h2>
+                            {{ focused_students }}
+                        </h2>
+
+                        <p>
+                            Students focused
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PHONE USAGE -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📱
+                    </div>
+
+                    <div class="stat-info">
+
+                        <h3>
+                            Phone Usage
+                        </h3>
+
+                        <h2>
+                            {{ phone_usage }}
+                        </h2>
+
+                        <p>
+                            Interactions detected
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- OFFLINE -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📴
+                    </div>
+
+                    <div class="stat-info">
+
+                        <h3>
+                            Offline
+                        </h3>
+
+                        <h2>
+                            {{ students_without_devices }}
+                        </h2>
+
+                        <p>
+                            Devices unavailable
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PRESENT -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ✅
+                    </div>
+
+                    <div class="stat-info">
+
+                        <h3>
+                            Present
+                        </h3>
+
+                        <h2>
+                            {{ present_students }}
+                        </h2>
+
+                        <p>
+                            Students present
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             STUDENT MONITORING
+        ================================================== -->
+
+        <section
+            class="activity-card view-panel"
+            id="student-monitoring-section"
+            data-views="attendance,student-report"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        👥 Classroom Student Monitoring
+                    </h2>
+
+                    <p>
+                        Individual attendance, phone interaction
+                        and focus status of students.
+                    </p>
+
+                </div>
+
+
+                <span class="session-badge">
+                    {{ total_students }} Students
+                </span>
+
+            </div>
+
+            <!-- Attendance Metric Summary Cards -->
+            <div class="dashboard-stats" style="margin: 15px 0 25px 0;">
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <h3>Present Students</h3>
+                        <h2>{{ present_students }}</h2>
+                        <p>Session check-in</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>Total Enrolled</h3>
+                        <h2>{{ total_students }}</h2>
+                        <p>Class roster</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📱</div>
+                    <div class="stat-info">
+                        <h3>Devices Connected</h3>
+                        <h2>{{ connected_devices }}</h2>
+                        <p>Registered phones</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📴</div>
+                    <div class="stat-info">
+                        <h3>No Device</h3>
+                        <h2>{{ students_without_devices }}</h2>
+                        <p>Devices missing</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            {% if monitoring_active %}
+
+
+                {% if student_monitoring %}
+
+
+                    <div class="monitoring-table-wrapper">
+
+                        <table class="monitoring-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Student
+                                    </th>
+
+                                    <th>
+                                        Attendance
+                                    </th>
+
+                                    <th>
+                                        Apps Used
+                                    </th>
+
+                                    <th>
+                                        Phone Interaction
+                                    </th>
+
+                                    <th>
+                                        Focus Score
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for student in student_monitoring %}
+
+
+                                    <tr>
+
+
+                                        <!-- STUDENT -->
+
+                                        <td>
+
+                                            <div class="student-name-cell">
+
+                                                <div class="student-avatar">
+
+                                                    
+
+                                                </div>
+
+
+                                                <div class="student-info">
+
+                                                    <strong>
+                                                        {{ student.student_name }}
+                                                    </strong><br>
+
+                                                    <small>
+                                                        {{ student.student_id }}
+                                                    </small>
+
+                                                </div>
+
+                                            </div>
+
+                                        </td>
+
+
+
+                                        <!-- ATTENDANCE -->
+
+                                        <td>
+
+                                            {% if student.is_present %}
+
+                                                <span
+                                                    class="status-badge status-present"
+                                                >
+                                                    ● Present
+                                                </span>
+
+                                            {% else %}
+
+                                                <span
+                                                    class="status-badge status-absent"
+                                                >
+                                                    ● Absent
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+
+                                        <!-- APPS USED -->
+
+                                        <td>
+
+                                            {% if student.usage_records %}
+
+                                                <div class="apps-used">
+
+                                                    {% for usage in student.usage_records %}
+
+                                                        {% if forloop.counter <= 4 %}
+
+                                                            <span class="app-chip">
+                                                                {{ usage.app_name }}
+                                                            </span>
+
+                                                        {% endif %}
+
+                                                    {% endfor %}
+
+                                                </div>
+
+
+                                                {% if student.usage_count > 4 %}
+
+                                                    <div class="app-count">
+
+                                                        +{{ student.usage_count|add:"-4" }}
+
+                                                        more interactions
+
+                                                    </div>
+
+                                                {% endif %}
+
+
+                                            {% else %}
+
+                                                <span class="status-offline">
+                                                    No app activity
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+
+                                        <!-- PHONE INTERACTION -->
+
+                                        <td>
+
+                                            <div class="interaction-count">
+                                                {{ student.usage_count }}
+                                            </div>
+
+                                            <div class="interaction-label">
+
+                                                detected interaction{{ student.usage_count|pluralize }}
+
+                                            </div>
+
+                                        </td>
+
+
+
+                                        <!-- FOCUS SCORE -->
+
+                                        <td>
+
+                                            {% if student.focus_score is not None %}
+
+
+                                                {% if student.focus_score >= 80 %}
+
+                                                    <span
+                                                        class="focus-score focus-score-high"
+                                                    >
+                                                        {{ student.focus_score|floatformat:1 }}%
+                                                    </span>
+
+
+                                                {% elif student.focus_score >= 60 %}
+
+                                                    <span
+                                                        class="focus-score focus-score-medium"
+                                                    >
+                                                        {{ student.focus_score|floatformat:1 }}%
+                                                    </span>
+
+
+                                                {% else %}
+
+                                                    <span
+                                                        class="focus-score focus-score-low"
+                                                    >
+                                                        {{ student.focus_score|floatformat:1 }}%
+                                                    </span>
+
+                                                {% endif %}
+
+
+                                            {% else %}
+
+                                                <span
+                                                    class="focus-score focus-score-none"
+                                                >
+                                                    —
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+
+                                        <!-- STATUS -->
+
+                                        <td>
+
+                                            {% if student.focus_score is not None %}
+
+
+                                                {% if student.focus_score >= 80 %}
+
+                                                    <span
+                                                        class="status-badge status-focused"
+                                                    >
+                                                        ● Focused
+                                                    </span>
+
+
+                                                {% elif student.focus_score >= 60 %}
+
+                                                    <span
+                                                        class="status-badge status-moderate"
+                                                    >
+                                                        ● Moderate
+                                                    </span>
+
+
+                                                {% else %}
+
+                                                    <span
+                                                        class="status-badge status-low"
+                                                    >
+                                                        ● Distracted
+                                                    </span>
+
+                                                {% endif %}
+
+
+                                            {% else %}
+
+                                                <span
+                                                    class="status-badge status-no-data"
+                                                >
+                                                    ● No Data
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                    </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div class="empty-data">
+
+                        <div class="empty-icon">
+                            👥
+                        </div>
+
+                        <h3>
+                            No students available
+                        </h3>
+
+                        <p>
+                            Registered students will appear here
+                            when the monitoring session is active.
+                        </p>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% else %}
+
+
+                <div class="empty-data">
+
+                    <div class="empty-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        Monitoring session not active
+                    </h3>
+
+                    <p>
+                        Start classroom monitoring to view
+                        individual student focus information.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =================================================
+             PHONE USAGE
+        ================================================== -->
+
+        <section
+            class="activity-card view-panel"
+            id="phone-usage-section"
+            data-view="phone-usage"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        📱 Phone Usage Activity
+                    </h2>
+
+                    <p>
+                        Application interactions detected
+                        during the current monitoring session.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- ML PREDICTION VS SESSION SCORE CLARIFICATION -->
+            <div style="font-size: 12px; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; line-height: 1.5;">
+                ℹ️ <strong>Understanding Event ML Predictions vs. Session Focus Scores:</strong> 
+                The <em>ML Prediction</em> column classifies individual app interactions by duration threshold (the demo model flags prolonged off-task events &gt; 60s as <em>Potentially Distracted</em> and brief events &le; 60s as <em>Focused / Low Duration</em>). In contrast, the <strong>Session Focus Score</strong> measures cumulative active time across the entire session, where all off-task seconds reduce the overall percentage.
+            </div>
+
+
+
+            {% if phone_usage_records %}
+
+
+                <div class="usage-table-wrapper">
+
+                    <table class="usage-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Student ID
+                                </th>
+
+                                <th>
+                                    Application
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Duration
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                            <th>
+                                ML Prediction
+                                <span title="Event-level prediction (Demo model flags prolonged events > 60s as Potentially Distracted; brief <= 60s as Focused)" style="cursor: help; font-size: 11px;">ℹ️</span>
+                            </th>
+                                </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for usage in phone_usage_records %}
+
+
+                                <tr>
+
+                                    <td>
+                                        {{ usage.student_id }}
+                                    </td>
+
+
+                                    <td>
+                                        📱 {{ usage.app_name }}
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if usage.category == "Educational" %}
+
+                                            <span class="category-educational">
+                                                Educational
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="category-other">
+                                                {{ usage.category }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+                                        {{ usage.duration }} sec
+                                    </td>
+
+
+                                    <!-- FIXED TIMESTAMP -->
+
+                                    <td>
+
+                                        <span
+                                            class="timestamp-value"
+                                            data-timestamp="{{ usage.timestamp }}"
+                                        >
+                                            {{ usage.timestamp }}
+                                        </span>
+
+                                    </td>
+
+
+                                <td>
+                                    {% if usage.ml_label %}
+                                        {% if usage.ml_prediction == 1 %}
+                                            <span class="status-badge status-low">⚠️ {{ usage.ml_label }}</span>
+                                        {% else %}
+                                            <span class="status-badge status-focused">🎯 {{ usage.ml_label }}</span>
+                                        {% endif %}
+                                        <div style="font-size: 10px; color: #888; margin-top: 3px;">
+                                            {% if usage.ml_is_demo %}Demo Model (Event Threshold){% else %}Real Model{% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="status-badge status-absent">Not available</span>
+                                    {% endif %}
+                                </td>
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty-data">
+
+                    <div class="empty-icon">
+                        📭
+                    </div>
+
+                    <h3>
+                        No phone usage detected
+                    </h3>
+
+                    <p>
+                        Phone activity will appear here when
+                        student devices send monitoring data.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =========================================================
+             SPRINT 3 - ALERTS
+             T3 - Teacher Alert Display
+        ========================================================= -->
+
+        <section
+            class="dashboard-card view-panel"
+            id="phone-alerts-section"
+            style="margin-top: 24px;"
+            data-view="phone-usage"
+        >
+
+            <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                "
+            >
+
+                <div>
+
+                    <h2 style="margin: 0;">
+                        🚨 Phone Usage Alerts
+                    </h2>
+
+                    <p
+                        style="
+                            margin: 6px 0 0 0;
+                            color: #777;
+                            font-size: 14px;
+                        "
+                    >
+                        Alerts generated from non-educational phone usage
+                    </p>
+
+                </div>
+
+
+                <div
+                    style="
+                        background: #fff3f3;
+                        color: #d9534f;
+                        padding: 8px 14px;
+                        border-radius: 20px;
+                        font-weight: 600;
+                        font-size: 14px;
+                    "
+                >
+                    {{ alert_records|length }}
+                    Alert{{ alert_records|length|pluralize }}
+                </div>
+
+            </div>
+
+
+
+            {% if monitoring_active %}
+
+
+                {% if alert_records %}
+
+
+                    <div
+                        style="
+                            display: flex;
+                            flex-direction: column;
+                            gap: 12px;
+                        "
+                    >
+
+
+                        {% for alert in alert_records %}
+
+
+                            <div
+                                style="
+                                    border: 1px solid #f0caca;
+                                    background: #fff8f8;
+                                    border-radius: 12px;
+                                    padding: 16px;
+                                "
+                            >
+
+                                <div
+                                    style="
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: flex-start;
+                                        gap: 15px;
+                                    "
+                                >
+
+                                    <div>
+
+
+                                        <div
+                                            style="
+                                                font-size: 17px;
+                                                font-weight: 700;
+                                                color: #d9534f;
+                                                margin-bottom: 8px;
+                                            "
+                                        >
+                                            ⚠️ {{ alert.app_name }}
+                                        </div>
+
+
+                                        <div
+                                            style="
+                                                font-size: 14px;
+                                                color: #444;
+                                                line-height: 1.7;
+                                            "
+                                        >
+
+                                            <!-- FIXED: ONLY ONE STUDENT ID -->
+
+                                            <strong>
+                                                Student ID:
+                                            </strong>
+
+                                            {{ alert.student_id }}
+
+                                            <br>
+
+                                            <span class="severity-badge severity-{{ alert.severity|lower|default:'low' }}">
+                                                {{ alert.severity|default:"Low" }} Severity
+                                            </span>
+
+
+                                            <strong>
+                                                Category:
+                                            </strong>
+
+                                            {{ alert.category }}
+
+                                            <br>
+
+
+                                            <strong>
+                                                Confidence:
+                                            </strong>
+
+                                            {{ alert.confidence }}
+
+                                            <br>
+
+
+                                            <strong>
+                                                Duration:
+                                            </strong>
+
+                                            {{ alert.duration }} seconds
+
+                                            <br>
+
+
+                                            <!-- FIXED TIMESTAMP -->
+
+                                            <strong>
+                                                Time:
+                                            </strong>
+
+                                            <span
+                                                class="timestamp-value"
+                                                data-timestamp="{{ alert.timestamp }}"
+                                            >
+                                                {{ alert.timestamp }}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    NON-EDUCATIONAL
+
+                                </div>
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div
+                        style="
+                            text-align: center;
+                            padding: 30px 20px;
+                            background: #f8fafc;
+                            border-radius: 12px;
+                            color: #666;
+                        "
+                    >
+
+                        <div
+                            style="
+                                font-size: 32px;
+                                margin-bottom: 10px;
+                            "
+                        >
+                            ✅
+                        </div>
+
+
+                        <div
+                            style="
+                                font-size: 16px;
+                                font-weight: 600;
+                                color: #444;
+                            "
+                        >
+                            No alerts detected
+                        </div>
+
+
+                        <div
+                            style="
+                                font-size: 13px;
+                                margin-top: 6px;
+                            "
+                        >
+                            No non-educational phone usage has been detected
+                            during this monitoring session.
+                        </div>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% else %}
+
+
+                <div
+                    style="
+                        text-align: center;
+                        padding: 30px 20px;
+                        background: #f8fafc;
+                        border-radius: 12px;
+                        color: #666;
+                    "
+
+
+                >
+
+                    <div
+                        style="
+                            font-size: 32px;
+                            margin-bottom: 10px;
+                        "
+                    >
+                        ⏸️
+                    </div>
+
+
+                    <div
+                        style="
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #444;
+                        "
+                    >
+                        Monitoring is not active
+                    </div>
+
+
+                    <div
+                        style="
+                            font-size: 13px;
+                            margin-top: 6px;
+                        "
+                    >
+                        Start classroom monitoring to view phone usage alerts.
+                    </div>
+
+                </div>
+
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =========================================================
+             SPRINT 3 - T7
+             ALERT HISTORY
+        ========================================================= -->
+
+        <section
+            class="activity-card view-panel"
+            id="alert-history-section"
+            style="margin-top: 24px;"
+            data-view="phone-usage"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        📋 Alert History
+                    </h2>
+
+                    <p>
+                        Alert records from the completed monitoring session.
+                    </p>
+
+                </div>
+
+
+                {% if alert_history_records %}
+
+                    <span class="session-badge">
+
+                        {{ alert_history_records|length }}
+
+                        Alert{{ alert_history_records|length|pluralize }}
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+
+            {% if not monitoring_active %}
+
+
+                {% if alert_history_records %}
+
+
+                    <div
+                        style="
+                            display: flex;
+                            flex-direction: column;
+                            gap: 12px;
+                        "
+                    >
+
+
+                        {% for alert in alert_history_records %}
+
+
+                            <div
+                                style="
+                                    border: 1px solid #e4e7ef;
+                                    background: #ffffff;
+                                    border-radius: 12px;
+                                    padding: 16px;
+                                "
+                            >
+
+                                <div
+                                    style="
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: flex-start;
+                                        gap: 15px;
+                                    "
+                                >
+
+                                    <div>
+
+
+                                        <div
+                                            style="
+                                                font-size: 17px;
+                                                font-weight: 700;
+                                                color: #d9534f;
+                                                margin-bottom: 8px;
+                                            "
+                                        >
+                                            ⚠️ {{ alert.app_name }}
+                                        </div>
+
+                                        <span class="severity-badge severity-{{ alert.severity|default:'low'|lower }}">
+                                            {{ alert.severity|default:"Low" }} Severity
+                                        </span>
+
+
+
+                                        <div
+                                            style="
+                                                font-size: 14px;
+                                                color: #444;
+                                                line-height: 1.7;
+                                            "
+                                        >
+
+                                            <strong>
+                                                Student ID:
+                                            </strong>
+
+                                            {{ alert.student_id }}
+
+                                            <br>
+
+
+                                            <strong>
+                                                Category:
+                                            </strong>
+
+                                            {{ alert.category }}
+
+                                            <br>
+
+
+                                            <strong>
+                                                Confidence:
+                                            </strong>
+
+                                            {{ alert.confidence }}
+
+                                            <br>
+
+
+                                            <strong>
+                                                Duration:
+                                            </strong>
+
+                                            {{ alert.duration }} seconds
+
+                                            <br>
+
+
+                                            <!-- FIXED TIMESTAMP -->
+
+                                            <strong>
+                                                Time:
+                                            </strong>
+
+                                            <span
+                                                class="timestamp-value"
+                                                data-timestamp="{{ alert.timestamp }}"
+                                            >
+                                                {{ alert.timestamp }}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div
+                                        style="
+                                            background: #f1f4ff;
+                                            color: #3e63dd;
+                                            padding: 6px 10px;
+                                            border-radius: 8px;
+                                            font-size: 12px;
+                                            font-weight: 700;
+                                            white-space: nowrap;
+                                        "
+                                    >
+                                        HISTORY
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div class="empty-data">
+
+                        <div class="empty-icon">
+                            📋
+                        </div>
+
+                        <h3>
+                            No alert history
+                        </h3>
+
+                        <p>
+                            No alerts were recorded during the completed
+                            monitoring session.
+                        </p>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% else %}
+
+
+                <div class="empty-data">
+
+                    <div class="empty-icon">
+                        ▶️
+                    </div>
+
+                    <h3>
+                        Session is currently active
+                    </h3>
+
+                    <p>
+                        Alert history will be available after the
+                        monitoring session is stopped.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =================================================
+             FOCUS REPORTS
+        ================================================== -->
+
+        <section
+            class="activity-card view-panel"
+            id="student-focus-section"
+            data-views="focus,student-report"
+        >
+
+            <div class="section-heading" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+
+                <div>
+
+                    <h2>
+                        🎯 Student Focus Report
+                    </h2>
+
+                    <p>
+                        Individual focus scores calculated from
+                        educational and non-educational phone usage.
+                    </p>
+
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{% url 'reports_analytics' %}" style="background: #3e63dd; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                        📊 Full Reports &amp; Analytics
+                    </a>
+                    <a href="{% url 'export_attendance_csv' %}" style="background: #16803c; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                        📥 Attendance CSV
+                    </a>
+                    <a href="{% url 'export_focus_csv' %}" style="background: #7c3aed; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                        📥 Focus Scores CSV
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Focus Score Metric Summary Cards -->
+            <div class="dashboard-stats" style="margin: 15px 0 25px 0;">
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <h3>Focused Students</h3>
+                        <h2>{{ focused_students }}</h2>
+                        <p>Focus score &ge; 60%</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>Students Evaluated</h3>
+                        <h2>{{ student_monitoring|length }}</h2>
+                        <p>Tracked in session</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <h3>High Focus Benchmark</h3>
+                        <h2>&ge; 70%</h2>
+                        <p>Target classroom focus</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-info">
+                        <h3>Session Telemetry</h3>
+                        <h2>{% if monitoring_active %}Live{% else %}Saved{% endif %}</h2>
+                        <p>{% if monitoring_active %}Real-time calculating{% else %}Ready{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            {% if student_monitoring %}
+
+
+                <div class="monitoring-table-wrapper">
+
+                    <table class="monitoring-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Student
+                                </th>
+
+                                <th>
+                                    Student ID
+                                </th>
+
+                                <th>
+                                    Educational Usage
+                                </th>
+
+                                <th>
+                                    Total Usage
+                                </th>
+
+                                <th>
+                                    Focus Score
+                                </th>
+
+                                <th>
+                                    Focus Level
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for student in student_monitoring %}
+
+
+                                <tr>
+
+
+                                    <td>
+
+                                        <div class="student-name-cell">
+
+                                            <div class="student-avatar">
+                                                
+                                            </div>
+
+                                            <strong>
+                                                {{ student.student_name }}
+                                            </strong>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        {{ student.student_id }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ student.educational_duration|floatformat:1 }}
+                                    </td>
+
+
+                                    <td>
+                                        {{ student.total_duration|floatformat:1 }}
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if student.focus_score is not None %}
+
+
+                                            <span
+                                                class="
+                                                    focus-score
+
+                                                    {% if student.focus_score >= 80 %}
+                                                        focus-score-high
+
+                                                    {% elif student.focus_score >= 60 %}
+                                                        focus-score-medium
+
+                                                    {% else %}
+                                                        focus-score-low
+
+                                                    {% endif %}
+                                                "
+                                            >
+
+                                                {{ student.focus_score|floatformat:1 }}%
+
+                                            </span>
+
+
+                                        {% else %}
+
+
+                                            <span class="focus-score-none">
+                                                No Data
+                                            </span>
+
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if student.focus_level == "Highly Focused" %}
+
+
+                                            <span
+                                                class="status-badge status-focused"
+                                            >
+                                                ● Highly Focused
+                                            </span>
+
+
+                                        {% elif student.focus_level == "Moderately Focused" %}
+
+
+                                            <span
+                                                class="status-badge status-moderate"
+                                            >
+                                                ● Moderately Focused
+                                            </span>
+
+
+                                        {% elif student.focus_level == "Low Focus" %}
+
+
+                                            <span
+                                                class="status-badge status-low"
+                                            >
+                                                ● Low Focus
+                                            </span>
+
+
+                                        {% else %}
+
+
+                                            <span
+                                                class="status-badge status-no-data"
+                                            >
+                                                ● No Data
+                                            </span>
+
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="empty-data">
+
+                    <div class="empty-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        No focus report available
+                    </h3>
+
+                    <p>
+                        Start a classroom monitoring session
+                        to calculate individual student focus scores.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     TIMESTAMP FORMATTER
+========================================================= -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            document
+                .querySelectorAll(".timestamp-value")
+                .forEach(
+                    function (element) {
+
+                        const rawTimestamp =
+                            element.dataset.timestamp;
+
+                        if (!rawTimestamp) {
+                            return;
+                        }
+
+
+                        const timestamp =
+                            Number(rawTimestamp);
+
+
+                        if (Number.isNaN(timestamp)) {
+                            return;
+                        }
+
+
+                        /*
+                         * Android sends Unix timestamps
+                         * in milliseconds.
+                         */
+
+                        const date =
+                            new Date(timestamp);
+
+
+                        if (
+                            Number.isNaN(
+                                date.getTime()
+                            )
+                        ) {
+                            return;
+                        }
+
+
+                        element.textContent =
+                            date.toLocaleString(
+                                "en-IN",
+                                {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                    hour12: true
+                                }
+                            );
+
+                    }
+                );
+
+        }
+    );
+
+</script>
+
+
+
+{% if monitoring_active %}
+
+<script>
+
+    // =========================================================
+    // SPRINT 3 - T6
+    // REAL-TIME ALERT UPDATE
+    // =========================================================
+
+    /*
+     * Refresh the teacher dashboard every 5 seconds while
+     * monitoring is active so newly stored alerts appear
+     * without manual browser refresh.
+     */
+
+    setInterval(
+        function () {
+
+            window.location.reload();
+
+        },
+        5000
+    );
+
+</script>
+
+{% endif %}
+
+
+<script>
+// =========================================================
+// VIEW SWITCHER — switchTeacherView(view)
+// Views: 'all' | 'focus' | 'attendance' | 'student-report'
+//        'phone-usage' | 'monitoring'
+// =========================================================
+function switchTeacherView(view) {
+    if (!view) view = 'all';
+
+    // Normalize view aliases (e.g. from hash #focusscore -> 'focus')
+    var raw = String(view).toLowerCase().replace(/[^a-z0-9-]/g, '');
+    var normalizedView = 'all';
+    if (raw === 'focus' || raw === 'focusscore' || raw === 'focus-score') {
+        normalizedView = 'focus';
+    } else if (raw === 'attendance') {
+        normalizedView = 'attendance';
+    } else if (raw === 'student-report' || raw === 'studentreport' || raw === 'student') {
+        normalizedView = 'student-report';
+    } else if (raw === 'phone-usage' || raw === 'phoneusage' || raw === 'phone') {
+        normalizedView = 'phone-usage';
+    } else if (raw === 'monitoring' || raw === 'live' || raw === 'live-monitoring') {
+        normalizedView = 'monitoring';
+    } else {
+        normalizedView = 'all';
+    }
+
+    // Persist selected view in localStorage and URL hash without forcing scroll jump
+    try {
+        localStorage.setItem('focusframe_teacher_view', normalizedView);
+        if (window.history && window.history.replaceState) {
+            var hashTarget = normalizedView === 'all' ? 'all' : normalizedView;
+            var cleanUrl = window.location.pathname + window.location.search + '#' + hashTarget;
+            window.history.replaceState(null, '', cleanUrl);
+        }
+    } catch (e) {}
+
+    // All panels that can be toggled
+    var panels = document.querySelectorAll('.view-panel');
+
+    // Pill buttons
+    var pills = document.querySelectorAll('.view-pill');
+
+    // Sidebar nav links
+    var navMap = {
+        'all':            document.getElementById('nav-all'),
+        'focus':          document.getElementById('nav-focus'),
+        'attendance':     document.getElementById('nav-attendance'),
+        'student-report': document.getElementById('nav-student-report'),
+        'phone-usage':    document.getElementById('nav-phone-usage'),
+        'monitoring':     document.getElementById('nav-monitoring')
+    };
+
+    // Pill id map
+    var pillMap = {
+        'all':            document.getElementById('pill-all'),
+        'focus':          document.getElementById('pill-focus'),
+        'attendance':     document.getElementById('pill-attendance'),
+        'student-report': document.getElementById('pill-student-report'),
+        'phone-usage':    document.getElementById('pill-phone-usage'),
+        'monitoring':     document.getElementById('pill-monitoring')
+    };
+
+    // Banner elements
+    var banner     = document.getElementById('active-view-banner');
+    var bannerText = document.getElementById('active-view-text');
+
+    // View labels
+    var viewLabels = {
+        'focus':          '🎯 Showing Focus Score Only',
+        'attendance':     '📋 Showing Attendance Only',
+        'student-report': '👥 Showing Student Report Only',
+        'phone-usage':    '📱 Showing Phone Usage Only',
+        'monitoring':     '📊 Showing Live Monitoring Only'
+    };
+
+    if (normalizedView === 'all') {
+        // Show everything
+        panels.forEach(function(p) {
+            p.classList.remove('view-hidden');
+        });
+        if (banner) banner.style.display = 'none';
+    } else {
+        // Filter panels: show only panels that explicitly match the requested view
+        panels.forEach(function(p) {
+            var pv = p.getAttribute('data-views') || p.getAttribute('data-view') || '';
+            var views = pv.split(',').map(function(v) { return v.trim(); });
+
+            if (views.indexOf(normalizedView) !== -1) {
+                p.classList.remove('view-hidden');
+            } else {
+                p.classList.add('view-hidden');
+            }
+        });
+
+        // Show isolated banner
+        if (banner) {
+            banner.style.display = 'flex';
+            if (bannerText) bannerText.textContent = viewLabels[normalizedView] || 'Isolated View';
+        }
+    }
+
+    // Update pill active states
+    pills.forEach(function(btn) { btn.classList.remove('active'); });
+    if (pillMap[normalizedView]) pillMap[normalizedView].classList.add('active');
+
+    // Update sidebar nav active states
+    Object.values(navMap).forEach(function(a) { if (a) a.classList.remove('active'); });
+    if (navMap[normalizedView]) navMap[normalizedView].classList.add('active');
+}
+
+// Restore saved or URL requested view on page load
+document.addEventListener("DOMContentLoaded", function () {
+    var urlParams = new URLSearchParams(window.location.search);
+    var viewParam = urlParams.get('view');
+    var hashParam = window.location.hash ? window.location.hash.substring(1) : '';
+    var savedView = null;
+    try {
+        savedView = localStorage.getItem('focusframe_teacher_view');
+    } catch (e) {}
+
+    var initialView = viewParam || hashParam || savedView || 'all';
+    switchTeacherView(initialView);
+});
+
+// Respond to browser back/forward and hash changes
+window.addEventListener('hashchange', function () {
+    var hash = window.location.hash ? window.location.hash.substring(1) : 'all';
+    switchTeacherView(hash);
+});
+</script>
+
+{% endblock %}

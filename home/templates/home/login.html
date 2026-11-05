@@ -1,0 +1,367 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}Sign In - FocusFrame{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<style>
+
+    .auth-page {
+        min-height: calc(100vh - 76px);
+    }
+
+    .role-tabs {
+        display: flex;
+        gap: 6px;
+        margin-top: 26px;
+        padding: 4px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 999px;
+    }
+
+    .role-tab {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 10px 0;
+        color: #aeb4c7;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .role-tab.is-active {
+        background: #3e63dd;
+        color: white;
+    }
+
+    .form-note.is-error {
+        color: #e5697b;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<main class="auth-main">
+
+<div class="auth-container">
+
+    <div class="viewfinder auth-card is-visible">
+
+        <span class="vf-bl" aria-hidden="true"></span>
+        <span class="vf-br" aria-hidden="true"></span>
+        <span class="vf-scanline" aria-hidden="true"></span>
+
+
+        <div class="auth-card-inner">
+
+            <!-- TITLE -->
+
+            <span class="eyebrow">
+                Session check-in
+            </span>
+
+            <h1 class="auth-title">
+                Sign in to FocusFrame
+            </h1>
+
+            <p class="auth-sub">
+                Use the account tied to your registered device.
+            </p>
+
+
+            <!-- ROLE BUTTONS -->
+
+            <div
+                class="role-tabs"
+                role="tablist"
+                aria-label="Choose account type"
+            >
+
+                <button
+                    type="button"
+                    class="role-tab is-active"
+                    data-role="student"
+                >
+                    Student
+                </button>
+
+
+                <button
+                    type="button"
+                    class="role-tab"
+                    data-role="teacher"
+                >
+                    Teacher
+                </button>
+
+
+                <button
+                    type="button"
+                    class="role-tab"
+                    data-role="admin"
+                >
+                    Admin
+                </button>
+
+            </div>
+
+
+            <!-- LOGIN FORM -->
+
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="
+                        background:#ffe5e5;
+                        color:#b42318;
+                        padding:12px;
+                        margin-bottom:15px;
+                        border-radius:8px;
+                        text-align:center;
+                        font-weight:500;
+                    ">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+        {% endif %}
+
+            <form id="loginForm" method="POST" action="{% url 'login' %}">
+
+                {% csrf_token %}
+
+
+                <!-- SELECTED ROLE -->
+
+                <input
+                    type="hidden"
+                    name="role"
+                    id="selectedRole"
+                    value="student"
+                >
+
+
+                <!-- USERNAME -->
+
+                <div class="field">
+
+                    <label for="loginId">
+
+                        <span id="roleLabel">
+                            Register number or email
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="loginId"
+                        name="username"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="field">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ERROR -->
+
+                {% if error %}
+
+                    <p
+                        class="form-note is-error"
+                        role="alert"
+                    >
+                        {{ error }}
+                    </p>
+
+                {% endif %}
+
+
+                <!-- LOGIN BUTTON -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary btn-block"
+                >
+                    Sign in
+                </button>
+
+                <div style="text-align: center; margin-top: 14px;">
+                    <a
+                         href="{% url 'password_reset' %}"
+                        style="color: #3e63dd; text-decoration: none;"
+                    >
+                        Forgot Password?
+                    </a>
+                </div>
+
+            </form>
+
+
+            <!-- CREATE ACCOUNT -->
+
+            <p class="auth-switch">
+
+                New to FocusFrame?
+
+                <a
+                    href="{% url 'register' %}?role=student"
+                    id="registerLink"
+                >
+                    Create an account
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</main>
+
+<!-- ROLE SWITCH SCRIPT -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const roleButtons =
+        document.querySelectorAll(".role-tab");
+
+    const selectedRole =
+        document.getElementById("selectedRole");
+
+    const roleLabel =
+        document.getElementById("roleLabel");
+
+    const registerLink =
+        document.getElementById("registerLink");
+
+
+    function updateRole(role) {
+
+        /* Save selected role */
+
+        selectedRole.value = role;
+
+
+        /* Update active button */
+
+        roleButtons.forEach(function (button) {
+
+            if (button.dataset.role === role) {
+
+                button.classList.add("is-active");
+
+            } else {
+
+                button.classList.remove("is-active");
+
+            }
+
+        });
+
+
+        /* Update label */
+
+        if (role === "student") {
+
+            roleLabel.textContent =
+                "Register number or email";
+
+            registerLink.href =
+                "{% url 'register' %}?role=student";
+
+            registerLink.style.display = "inline";
+
+        }
+
+
+        else if (role === "teacher") {
+
+            roleLabel.textContent =
+                "Employee ID or email";
+
+            registerLink.href =
+                "{% url 'register' %}?role=teacher";
+
+            registerLink.style.display = "inline";
+
+        }
+
+
+        else if (role === "admin") {
+
+            roleLabel.textContent =
+                "Admin ID or email";
+
+            /*
+             * Admin does not need registration.
+             * Hide the Create Account link.
+             */
+
+            registerLink.style.display = "none";
+
+        }
+
+    }
+
+
+    /* Role button clicks */
+
+    roleButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const role =
+                button.dataset.role;
+
+            updateRole(role);
+
+        });
+
+    });
+
+
+    /* Initial role */
+
+    updateRole("student");
+
+});
+
+</script>
+
+{% endblock %}

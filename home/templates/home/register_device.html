@@ -1,0 +1,472 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Register Device — FocusFrame</title>
+
+<style>
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fc;
+        color: #10132B;
+    }
+
+    .dashboard {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+        width: 260px;
+        min-width: 260px;
+        min-height: 100vh;
+        background: #10132B;
+        color: white;
+        padding: 30px 20px;
+    }
+
+    .logo {
+        margin-bottom: 40px;
+    }
+
+    .logo h2 {
+        font-size: 32px;
+        margin-bottom: 8px;
+        color: white;
+    }
+
+    .logo p {
+        color: #c9d0e4;
+        font-size: 16px;
+    }
+
+    .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sidebar nav a {
+        display: block;
+        width: 100%;
+        text-decoration: none;
+        color: #d8dff2;
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+        background: #2D5BFF;
+        color: white;
+    }
+
+    /* =========================
+       MAIN CONTENT
+    ========================= */
+
+    .content {
+        flex: 1;
+        padding: 40px 50px;
+        background: #f5f7fc;
+    }
+
+    .device-page {
+        width: 100%;
+    }
+
+    /* =========================
+       DEVICE CARD
+    ========================= */
+
+    .device-card {
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border-radius: 18px;
+        padding: 35px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .device-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .device-card h1 {
+        font-size: 32px;
+        line-height: 1.2;
+        margin-bottom: 10px;
+        color: #10132B;
+    }
+
+    .device-card > p {
+        color: #6b7280;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    /* =========================
+       MESSAGES
+    ========================= */
+
+    .message {
+        padding: 14px 16px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .message.success {
+        background: #e8f8ee;
+        color: #16733b;
+        border: 1px solid #b8e6c8;
+    }
+
+    .message.error {
+        background: #fff0f0;
+        color: #b42318;
+        border: 1px solid #f1b8b8;
+    }
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .device-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 15px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #d7dce5;
+        border-radius: 10px;
+        font-size: 15px;
+        outline: none;
+        background: white;
+        color: #10132B;
+    }
+
+    .form-group input::placeholder {
+        color: #9ca3af;
+    }
+
+    .form-group input:focus {
+        border-color: #2D5BFF;
+        box-shadow: 0 0 0 3px rgba(45, 91, 255, 0.1);
+    }
+
+    /* =========================
+       BUTTON
+    ========================= */
+
+    .register-button {
+        margin-top: 10px;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 10px;
+        background: #2D5BFF;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .register-button:hover {
+        background: #2148d8;
+        transform: translateY(-1px);
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 900px) {
+
+        .dashboard {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            min-width: 100%;
+            min-height: auto;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .content {
+            padding: 20px;
+        }
+
+        .device-card {
+            padding: 25px;
+        }
+
+        .device-card h1 {
+            font-size: 26px;
+        }
+
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="dashboard">
+<!-- =========================
+     SIDEBAR
+========================== -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <h2>FocusFrame</h2>
+
+        <p>Student Panel</p>
+
+    </div>
+
+
+    <nav>
+
+        <a href="{% url 'student_dashboard' %}">
+            🏠 Dashboard
+        </a>
+
+        <a href="{% url 'scan_qr' %}">
+            📷 Scan QR
+        </a>
+
+        <a href="{% url 'student_dashboard' %}#session-card-section">
+            📅 Attendance
+        </a>
+
+        <a href="{% url 'student_dashboard' %}#focus-overview-section">
+            📱 Phone Usage
+        </a>
+
+        <a href="{% url 'register_device' %}"
+           class="active">
+            📲 Register Device
+        </a>
+
+        <a href="{% url 'logout' %}">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</aside>
+
+
+<!-- =========================
+     MAIN CONTENT
+========================== -->
+
+<main class="content">
+
+    <div class="device-page">
+
+        <div class="device-card">
+
+            <div class="device-icon">
+                📱
+            </div>
+
+
+            <h1>
+                Register Your Android Device
+            </h1>
+
+
+            <p>
+                Enter your device details below to connect
+                your phone to FocusFrame monitoring.
+                <br>
+                Authenticated Student: <strong>{{ student_name|default:request.user.first_name }}</strong>
+                (ID: <strong>{{ student_id|default:request.user.username }}</strong>)
+            </p>
+
+
+            <!-- DJANGO MESSAGES -->
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="message
+                        {% if message.tags == 'success' %}
+                            success
+                        {% else %}
+                            error
+                        {% endif %}">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+
+            <!-- DEVICE FORM -->
+
+            <form method="POST"
+                  class="device-form">
+
+                {% csrf_token %}
+
+
+                <div class="form-group">
+
+                    <label for="student_name">
+                        Student Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="student_name"
+                        name="student_name"
+                        placeholder="Enter your full name"
+                        value="{{ student_name|default:request.user.first_name }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="register_number">
+                        Register Number (Student ID)
+                    </label>
+
+                    <input
+                        type="text"
+                        id="register_number"
+                        name="register_number"
+                        placeholder="Enter your register number"
+                        value="{{ student_id|default:request.user.username }}"
+                        readonly
+                        style="background-color: #f3f4f6; cursor: not-allowed; font-weight: 600;"
+                        required
+                    >
+                    <small style="color: #6b7280; font-size: 13px; margin-top: 2px;">
+                        Pre-filled from your logged-in student account: <strong>{{ student_id|default:request.user.username }}</strong>
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="device_name">
+                        Device Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="device_name"
+                        name="device_name"
+                        placeholder="Example: Samsung Galaxy A55"
+                        required
+                    >
+
+                </div>
+
+
+                
+
+
+                <div class="form-group">
+
+                    <label for="android_version">
+                        Android Version
+                    </label>
+
+                    <input
+                        type="text"
+                        id="android_version"
+                        name="android_version"
+                        placeholder="Example: Android 15"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="register-button">
+
+                    📲 Register Device
+
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+</main>
+
+
+</div>
+
+</body>
+
+</html>

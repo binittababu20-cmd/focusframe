@@ -1,0 +1,388 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Scan QR — FocusFrame</title>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #10132B;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .qr-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 45px rgba(16, 19, 43, 0.12);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #687083;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+        }
+
+        #qr-reader video {
+            border-radius: 14px;
+        }
+
+        #scan-message {
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 10px;
+            background: #f1f4ff;
+            color: #3e63dd;
+            font-weight: 600;
+        }
+
+        .privacy {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 12px;
+            background: #f7f8fa;
+            color: #687083;
+            text-align: left;
+        }
+
+        .privacy strong {
+            color: #10132B;
+        }
+
+        .privacy p {
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            background: #10132B;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .back-button:hover {
+            opacity: 0.9;
+        }
+
+        .success {
+            background: #eaf8ef !important;
+            color: #16794c !important;
+        }
+
+        .error {
+            background: #fff0f0 !important;
+            color: #b42318 !important;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+    <div class="qr-card">
+
+        <div class="logo">
+            FOCUSFRAME
+        </div>
+
+        <h1 class="title">
+            📷 Scan Classroom QR
+        </h1>
+
+        <p class="description">
+            Ask your teacher to display the classroom QR code.
+            Scan it to check in for today's session.
+        </p>
+
+
+        <!-- QR CAMERA -->
+
+        <div id="qr-reader"></div>
+
+        <!-- DEMO SIMULATION BUTTON -->
+        <div style="margin-bottom: 15px;">
+            <button
+                type="button"
+                onclick="onScanSuccess('CS-402 Mobile Computing', null)"
+                style="background: #3e63dd; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;"
+            >
+                ⚡ Simulate QR Check-In (Demo)
+            </button>
+        </div>
+
+
+        <!-- MESSAGE -->
+
+        <div id="scan-message">
+            Point your camera at the classroom QR code.
+        </div>
+
+
+        <!-- ATTENDANCE FORM -->
+
+        <form
+            id="attendance-form"
+            method="POST"
+            style="display:none;"
+        >
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="classroom"
+                id="classroom"
+            >
+
+        </form>
+
+
+        <!-- PRIVACY -->
+
+        <div class="privacy">
+
+            🔒 <strong>Privacy</strong>
+
+            <p>
+                FocusFrame uses the camera only for QR scanning.
+                No photos or videos are stored.
+            </p>
+
+        </div>
+
+
+        <!-- BACK -->
+
+        <a
+            href="{% url 'student_dashboard' %}"
+            class="back-button"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    let scanner = null;
+
+    let alreadyScanned = false;
+
+
+    // =================================================
+    // QR SCAN SUCCESS
+    // =================================================
+
+    function onScanSuccess(decodedText, decodedResult) {
+
+        if (alreadyScanned) {
+            return;
+        }
+
+        alreadyScanned = true;
+
+        console.log("QR Code:", decodedText);
+
+
+        if (scanner) {
+
+            scanner.clear();
+
+        }
+
+
+        document.getElementById("classroom").value =
+            decodedText;
+
+
+        const message =
+            document.getElementById("scan-message");
+
+        message.innerHTML =
+            "⏳ Marking attendance...";
+
+        message.className = "";
+
+
+        const form =
+            document.getElementById("attendance-form");
+
+        const formData =
+            new FormData(form);
+
+
+        fetch("{% url 'scan_qr' %}", {
+
+            method: "POST",
+
+            body: formData,
+
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+
+        })
+
+
+        .then(function(response) {
+
+            return response.json();
+
+        })
+
+
+        .then(function(data) {
+
+            if (data.success) {
+
+                message.innerHTML =
+                    "✅ Attendance marked successfully!";
+
+                message.className = "success";
+
+
+                setTimeout(function() {
+
+                    window.location.href =
+                        "{% url 'student_dashboard' %}";
+
+                }, 1200);
+
+            }
+
+            else {
+
+                alreadyScanned = false;
+
+                message.innerHTML =
+                    "❌ " + data.message;
+
+                message.className = "error";
+
+            }
+
+        })
+
+
+        .catch(function(error) {
+
+            console.error(error);
+
+            alreadyScanned = false;
+
+            message.innerHTML =
+                "❌ Something went wrong. Please try again.";
+
+            message.className = "error";
+
+        });
+
+    }
+
+
+    // =================================================
+    // QR SCAN FAILURE
+    // =================================================
+
+    function onScanFailure(error) {
+
+        // Ignore continuous scanning errors.
+
+    }
+
+
+    // =================================================
+    // START SCANNER
+    // =================================================
+
+    scanner = new Html5QrcodeScanner(
+
+        "qr-reader",
+
+        {
+
+            fps: 10,
+
+            qrbox: {
+                width: 250,
+                height: 250
+            }
+
+        },
+
+        false
+
+    );
+
+
+    scanner.render(
+
+        onScanSuccess,
+
+        onScanFailure
+
+    );
+
+</script>
+
+
+</body>
+
+</html>
