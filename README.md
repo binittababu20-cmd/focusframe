@@ -67,7 +67,7 @@ FocusFrame/
 - Android usage monitoring application developed.
 - Firebase data integration implemented.
 - Rule-based application categorization implemented.
-- Machine learning model prototype developed separately; real-world model performance has not yet been established.
+- Machine learning model prototype developed separately.
 
 ## Future Improvements
 
