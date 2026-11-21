@@ -84,3 +84,22 @@ GitHub: https://github.com/binittababu20-cmd/focusframe
 ---
 
 *Developed as an academic project.*
+## Project Screenshots
+
+### Teacher Dashboard
+![Teacher Dashboard](teacher_dashbrd.png)
+
+### Student Dashboard
+![Student Dashboard](student_dashbrd.png)
+
+### Attendance Management
+![Attendance](attendance.png)
+
+### Focus Score
+![Focus Score](focusscore.png)
+
+### Additional Interface
+![Project Interface](image.png)
+
+### QR Code / QR Attendance
+![QR Attendance](gr.png)
